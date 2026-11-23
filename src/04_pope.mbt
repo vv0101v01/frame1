@@ -84,11 +84,6 @@ pub fn legendre(n : Int32, x : Double) -> Double {
 }
 
 ///|
-pub fn legendre_deriv(n : Int32, x : Double) -> Double {
-  poly_deriv_eval(legendre_coeffs(n), x)
-}
-
-///|
 pub(all) struct Quad {
   nodes : Array[Double]
   weights : Array[Double]
@@ -196,11 +191,6 @@ pub fn softplus(x : Double) -> Double {
 }
 
 ///|
-pub fn pope_frequencies(dim : Int32, base : Double) -> Array[Double] {
-  Array::makei(dim, fn(c) { @math.pow(base, c.to_double() / dim.to_double()) })
-}
-
-///|
 pub(all) struct PolarPoPE {
   dim : Int32
   base : Double
@@ -278,17 +268,6 @@ pub fn pope_2d_score(
 ///|
 pub fn[T : PosKernel] kernel_gram(k : T, len : Int32) -> Array[Double] {
   Array::makei(len * len, fn(t) { k.eval(t / len - t % len) })
-}
-
-///|
-pub fn matvec(a : Array[Double], v : Array[Double], n : Int32) -> Array[Double] {
-  Array::makei(n, fn(i) {
-    let mut s = 0.0
-    for j in 0..<n {
-      s += a[i * n + j] * v[j]
-    }
-    s
-  })
 }
 
 ///|

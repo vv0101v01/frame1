@@ -250,19 +250,6 @@ pub fn EisensteinDatum::constant_term_matrix(
 }
 
 ///|
-/// The entry `c(u v^{-1}, vλ)` as a scalar (the "intertwining amplitude"
-/// from the exponent `vλ` to the exponent `uλ`).
-pub fn EisensteinDatum::amplitude(
-  self : EisensteinDatum,
-  u : Int32,
-  v : Int32,
-) -> Double {
-  let ws = weyl_group(self.rank)
-  let w = weyl_mul(ws[u], weyl_inv(ws[v]))
-  c_function(w, weyl_act(ws[v], self.lambda))
-}
-
-///|
 /// The Eisenstein spectral projection `Π(λ) = A(λ)/|W|`.
 /// Theorem T20: `Π² = Π`, `tr Π = 1`: the constant-term functor carries a
 /// canonical rank-one projection onto the Eisenstein line of the spectrum.
@@ -313,25 +300,6 @@ pub fn EisensteinDatum::projection_trace(self : EisensteinDatum) -> Double {
 pub fn EisensteinDatum::scattering_det(self : EisensteinDatum) -> Double {
   let n = weyl_group(self.rank).length()
   determinant(self.constant_term_matrix(), n)
-}
-
-///|
-/// Dimension of the space of `CT`-fixed coefficient vectors: the number of
-/// Weyl orbits on which `c(w,λ)` is non-zero.  (For dominant regular `λ`
-/// this is 1: the constant term of an Eisenstein series is *not* an
-/// automorphic form, only its projection is.)
-pub fn EisensteinDatum::eisenstein_multiplicity(
-  self : EisensteinDatum,
-  tol~ : Double = 1.0e-9,
-) -> Int32 {
-  let ws = weyl_group(self.rank)
-  let mut k = 0
-  for i in 0..<ws.length() {
-    if c_function(ws[i], self.lambda).abs() > tol {
-      k += 1
-    }
-  }
-  k
 }
 
 // ---------------------------------------------------------------------------
@@ -394,17 +362,19 @@ pub fn constant_term_numeric(
 }
 
 ///|
-/// `φ(s)φ(1-s) - 1`: the functional equation of the intertwining operator.
+/// `|φ(s)φ(1-s) - 1|`: the functional equation of the intertwining operator,
+/// which is nothing but the local reflection law `c(t)c(-t) = 1` at `t = 2s-1`.
 pub fn phi_functional_defect(s : Double) -> Double {
-  let phi = fn(t) { c_factor(2.0 * t - 1.0) }
-  (phi(s) * phi(1.0 - s) - 1.0).abs()
+  c_reflection_defect(2.0 * s - 1.0)
 }
 
 ///|
-/// Residue of `E(z,s)` at `s = 1` predicted by `φ`: `lim (s-1)φ(s)`.
-/// Theorem T19 asserts the value `1/ξ(2) = 3/π`, independent of `z`.
+/// Residue of `E(z,s)` at `s = 1`, predicted by the pole of `c` at `t = 1`:
+/// `lim_{s→1}(s-1)φ(s) = ½·lim_{t→1}(t-1)c(t) = 1/(2ξ(2)) = 3/π`
+/// (Theorem T19b).  Expressed through `c_pole_witness` so that the residue
+/// exists in exactly one place in the code base.
 pub fn residue_at_one(eps~ : Double = 1.0e-6) -> Double {
-  eps * c_factor(2.0 * (1.0 + eps) - 1.0)
+  0.5 * c_pole_witness(1.0 + 2.0 * eps)
 }
 
 ///|

@@ -32,12 +32,6 @@ pub(all) struct Mat2 {
 }
 
 ///|
-///Identity of `SL_2`.
-pub fn mat2_id() -> Mat2 {
-  { a: 1.0, b: 0.0, c: 0.0, d: 1.0, }
-}
-
-///|
 ///Product of 2x2 matrices.
 pub fn mat2_mul(x : Mat2, y : Mat2) -> Mat2 {
   {
@@ -125,6 +119,25 @@ pub fn goldman_tensor(x : Double, y : Double, z : Double) -> Array[Double] {
 }
 
 ///|
+/// Central-difference gradient of a scalar function on the 3-dimensional
+/// trace-coordinate space.
+fn grad_at(
+  f : (Array[Double]) -> Double,
+  p : Array[Double],
+  h : Double,
+) -> Array[Double] {
+  let out : Array[Double] = []
+  for i in 0..<3 {
+    let up : Array[Double] = [p[0], p[1], p[2]]
+    let dn : Array[Double] = [p[0], p[1], p[2]]
+    up[i] = p[i] + h
+    dn[i] = p[i] - h
+    out.push((f(up) - f(dn)) / (2.0 * h))
+  }
+  out
+}
+
+///|
 /// Poisson bracket of two differentiable functions on the character variety,
 /// `{f,g} = Σ_{i<j} P^{ij}(∂_i f ∂_j g - ∂_j f ∂_i g)`, with central
 /// differences.
@@ -134,21 +147,13 @@ pub fn poisson_bracket(
   p : Array[Double],
   h~ : Double = 1.0e-5,
 ) -> Double {
-  let grad_f : Array[Double] = []
-  let grad_g : Array[Double] = []
-  for i in 0..<3 {
-    let up : Array[Double] = [p[0], p[1], p[2]]
-    let dn : Array[Double] = [p[0], p[1], p[2]]
-    up[i] = p[i] + h
-    dn[i] = p[i] - h
-    grad_f.push((f(up) - f(dn)) / (2.0 * h))
-    grad_g.push((g(up) - g(dn)) / (2.0 * h))
-  }
+  let gf = grad_at(f, p, h)
+  let gg = grad_at(g, p, h)
   let t = goldman_tensor(p[0], p[1], p[2])
   let mut s = 0.0
   for i in 0..<3 {
     for j in 0..<3 {
-      s += t[i * 3 + j] * grad_f[i] * grad_g[j]
+      s += t[i * 3 + j] * gf[i] * gg[j]
     }
   }
   s
@@ -249,17 +254,6 @@ pub fn betti_dim(genus : Int32, punctures : Int32, n : Int32) -> Int32 {
 /// for `GL_n`, i.e. `(2g-2)n² + 2`.
 pub fn betti_dim_gl(genus : Int32, n : Int32) -> Int32 {
   (2 * genus - 2) * n * n + 2
-}
-
-///|
-/// Number of independent trace coordinates: `dim M_B`, used as a sanity
-/// bound on generated coordinates.
-pub fn trace_coordinate_count(
-  genus : Int32,
-  punctures : Int32,
-  n : Int32,
-) -> Int32 {
-  betti_dim(genus, punctures, n)
 }
 
 // ---------------------------------------------------------------------------

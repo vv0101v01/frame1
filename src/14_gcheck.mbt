@@ -113,6 +113,26 @@ pub fn gcheck_weights(blocks : Array[Int32]) -> Array[Double] {
 }
 
 ///|
+/// Number of weights (i.e. `n`), given the Jordan type.
+fn weights_count(blocks : Array[Int32]) -> Int32 {
+  partition_sum(blocks)
+}
+
+///|
+/// Multiplicity of the weight *value* `v` in `h` (not to be confused with
+/// `gcheck_multiplicity`, which counts the weight spaces of `Θ = ad(h/2)`).
+fn weight_value_multiplicity(blocks : Array[Int32], v : Double) -> Int32 {
+  let w = gcheck_weights(blocks)
+  let mut m = 0
+  for i in 0..<w.length() {
+    if (w[i] - v).abs() < 1.0e-9 {
+      m += 1
+    }
+  }
+  m
+}
+
+///|
 /// Multiplicity of the weight `k` in `spec Θ`: `#{(i,j) : h_i - h_j = k}`.
 pub fn gcheck_multiplicity(blocks : Array[Int32], k : Int32) -> Int32 {
   let w = gcheck_weights(blocks)
@@ -130,19 +150,13 @@ pub fn gcheck_multiplicity(blocks : Array[Int32], k : Int32) -> Int32 {
 ///|
 /// Dimension of the fixed space `ker Θ`, i.e. of the Levi of the *parabolic
 /// defined by the grading*: `Σ_v m_v²`, where `m_v` is the multiplicity of the
-/// weight `v` of `h`.  (Note `ker Θ` is larger than the block-diagonal Levi
-/// `Σ λ_i²` whenever two different blocks share a weight.)
+/// weight `v` of `h` (computed from `gcheck_multiplicity`, so the two can
+/// never disagree).
 pub fn gcheck_kernel_dim(blocks : Array[Int32]) -> Int32 {
   let w = gcheck_weights(blocks)
   let mut total = 0
-  for i in 0..<w.length() {
-    let mut m = 0
-    for j in 0..<w.length() {
-      if (w[i] - w[j]).abs() < 1.0e-9 {
-        m += 1
-      }
-    }
-    total += m
+  for i in 0..<weights_count(blocks) {
+    total += weight_value_multiplicity(blocks, w[i])
   }
   total
 }
@@ -159,14 +173,22 @@ pub fn levi_dim(blocks : Array[Int32]) -> Int32 {
 }
 
 ///|
-/// Dimension of the parabolic `p_Θ = ⊕_{k≥0} ^g_k`:
-/// `#{(i,j) : h_i ≥ h_j}`.
-pub fn gcheck_parabolic_dim(blocks : Array[Int32]) -> Int32 {
+/// Number of ordered weight pairs `(i,j)` with `h_i ≥ h_j`, resp. `h_i > h_j`,
+/// resp. `h_i = h_j`.  One loop, three public wrappers (no duplicated scans).
+fn weight_pair_count(blocks : Array[Int32], mode : Int32) -> Int32 {
   let w = gcheck_weights(blocks)
   let mut cnt = 0
   for i in 0..<w.length() {
     for j in 0..<w.length() {
-      if w[i] >= w[j] - 1.0e-9 {
+      let d = w[i] - w[j]
+      let hit = if mode == 0 {
+        d.abs() < 1.0e-9
+      } else if mode == 1 {
+        d > 1.0e-9
+      } else {
+        d > -1.0e-9
+      }
+      if hit {
         cnt += 1
       }
     }
@@ -175,10 +197,16 @@ pub fn gcheck_parabolic_dim(blocks : Array[Int32]) -> Int32 {
 }
 
 ///|
+/// Dimension of the parabolic `p_Θ = ⊕_{k≥0} ^g_k`: `#{(i,j) : h_i ≥ h_j}`.
+pub fn gcheck_parabolic_dim(blocks : Array[Int32]) -> Int32 {
+  weight_pair_count(blocks, 2)
+}
+
+///|
 /// Dimension of the centraliser of the *triple* `(e,h,f)`: by `sl_2`-theory it
 /// equals the number of Jordan blocks (one scalar per block).
 pub fn jm_centralizer_dim(blocks : Array[Int32]) -> Int32 {
-  blocks.length()
+  partition_length(blocks)
 }
 
 ///|
@@ -275,16 +303,7 @@ pub fn gcheck_rho_shift(
 /// Number of *positive* weights occurring, `#{h_i > h_j}`, i.e. half the
 /// number of off-diagonal coordinates of `gl_n` that the operator moves up.
 pub fn gcheck_positive_weights(blocks : Array[Int32]) -> Int32 {
-  let w = gcheck_weights(blocks)
-  let mut cnt = 0
-  for i in 0..<w.length() {
-    for j in 0..<w.length() {
-      if w[i] > w[j] + 1.0e-9 {
-        cnt += 1
-      }
-    }
-  }
-  cnt
+  weight_pair_count(blocks, 1)
 }
 
 // ---------------------------------------------------------------------------

@@ -148,11 +148,7 @@ pub fn run_langlands(cfg : LanglandsConfig) -> LanglandsTrace {
   let mut first_ks = 0.0
   let mut last_order = 0.0
   let mut last_ks = 0.0
-  let mut _last_trace_sp = 0.0
-  let mut _last_jd = 0.0
   let mut last_def = 0.0
-  let mut _last_eis = 0.0
-  let mut _last_fixed = 0.0
   for step in 0..<=cfg.steps {
     // ---- measurements -----------------------------------------------------
     let kappas : Array[Double] = []
@@ -201,11 +197,7 @@ pub fn run_langlands(cfg : LanglandsConfig) -> LanglandsTrace {
     }
     last_order = order
     last_ks = ks
-    _last_trace_sp = trace_sp
-    _last_jd = jd
     last_def = def_mean
-    _last_eis = eis
-    _last_fixed = fixed_ratio
     let row = step.to_string() +
       "," +
       order.to_string() +

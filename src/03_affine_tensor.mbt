@@ -102,13 +102,8 @@ pub fn affine_map(
   b : Array[Double],
   n : Int32,
 ) -> Array[Double] {
-  Array::makei(n, fn(i) {
-    let mut s = b[i]
-    for j in 0..<n {
-      s += a[i * n + j] * x[j]
-    }
-    s
-  })
+  let ax = matvec(a, x, n)
+  Array::makei(n, fn(i) { ax[i] + b[i] })
 }
 
 ///|

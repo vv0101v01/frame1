@@ -22,76 +22,6 @@
 // ============================================================================
 
 ///|
-/// Gaussian-elimination rank of an `r × c` matrix, with a relative pivot
-/// threshold.  Integer-valued matrices (the only ones used here) give exact
-/// ranks for any `tol < 1`.
-pub fn matrix_rank(
-  a_in : Array[Double],
-  r : Int32,
-  c : Int32,
-  tol~ : Double = 1.0e-9,
-) -> Int32 {
-  let a : Array[Double] = []
-  for i in 0..<(r * c) {
-    a.push(a_in[i])
-  }
-  let mut rank = 0
-  let mut row = 0
-  for col in 0..<c {
-    if row >= r {
-      break
-    }
-    // partial pivot
-    let mut best = row
-    let mut bestv = a[row * c + col].abs()
-    for i in (row + 1)..<r {
-      if a[i * c + col].abs() > bestv {
-        best = i
-        bestv = a[i * c + col].abs()
-      }
-    }
-    if bestv <= tol {
-      continue
-    }
-    if best != row {
-      for j in 0..<c {
-        let t = a[row * c + j]
-        a[row * c + j] = a[best * c + j]
-        a[best * c + j] = t
-      }
-    }
-    let piv = a[row * c + col]
-    for i in (row + 1)..<r {
-      let f = a[i * c + col] / piv
-      if f != 0.0 {
-        for j in col..<c {
-          a[i * c + j] -= f * a[row * c + j]
-        }
-      }
-    }
-    row += 1
-    rank += 1
-  }
-  rank
-}
-
-///|
-/// Nullity of an `r × c` matrix: `c - rank`.
-pub fn matrix_nullity(a : Array[Double], r : Int32, c : Int32) -> Int32 {
-  c - matrix_rank(a, r, c)
-}
-
-///|
-/// Products of matrices in the same `n × n` shape, `k` times.
-pub fn mat_power(a : Array[Double], n : Int32, k : Int32) -> Array[Double] {
-  let mut out = mat_identity(n)
-  for _ in 0..<k {
-    out = matrix_product(out, n, n, a, n)
-  }
-  out
-}
-
-///|
 /// The commutator operator `ad_N : X ↦ XN - NX` on `gl_n`, flattened to an
 /// `n² × n²` matrix (row index `(i,j)`, column index `(k,l)`).
 pub fn adjoint_operator(nil : Array[Double], n : Int32) -> Array[Double] {
@@ -344,16 +274,10 @@ pub fn LParameter::is_semisimple(self : LParameter) -> Bool {
 
 ///|
 /// Jordan matrix of the parameter: `diag(λ_i) + N`, with `N` the standard
-/// nilpotent of type `blocks`.
+/// nilpotent of type `blocks`.  Delegates to `eisenstein_local_system` so that
+/// "L-parameter matrix" and "Eisenstein local system" cannot drift apart.
 pub fn LParameter::matrix(self : LParameter) -> Array[Double] {
-  let n = self.n
-  let nil = nilpotent_standard(self.blocks)
-  let m : Array[Double] = []
-  for i in 0..<(n * n) {
-    let diag = if i % n == i / n { self.eigenvalues[i / n] } else { 0.0 }
-    m.push(nil[i] + diag)
-  }
-  m
+  eisenstein_local_system(self.blocks, self.eigenvalues)
 }
 
 ///|
@@ -420,26 +344,6 @@ pub fn LParameter::is_irreducible(self : LParameter) -> Bool {
 /// distinguishes "Arthur parameters" from the rest of `Par_G`.
 pub fn LParameter::arthur_defect(self : LParameter) -> Int32 {
   unipotent_defect(self.blocks)
-}
-
-///|
-/// Human-readable signature, e.g. `"GL4 [1.0x2, 1.0x2] (2,2)"`.
-pub fn LParameter::signature(self : LParameter) -> String {
-  let mut bl = "["
-  for i in 0..<self.blocks.length() {
-    bl = bl + self.blocks[i].to_string()
-    if i + 1 < self.blocks.length() {
-      bl = bl + ","
-    }
-  }
-  bl = bl + "]"
-  let mut s = "GL" + self.n.to_string() + " blocks=" + bl
-  if self.is_semisimple() {
-    s = s + " semisimple"
-  } else {
-    s = s + " nonsemisimple(defect=" + self.arthur_defect().to_string() + ")"
-  }
-  s
 }
 
 // ---------------------------------------------------------------------------

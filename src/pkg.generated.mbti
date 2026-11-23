@@ -238,8 +238,6 @@ pub fn legendre(Int32, Double) -> Double
 
 pub fn legendre_coeffs(Int32) -> Array[Double]
 
-pub fn legendre_deriv(Int32, Double) -> Double
-
 pub fn legendre_gram(Int32, Int32, Quad) -> Double
 
 pub fn legendre_jacobi(Int32) -> Array[Double]
@@ -256,15 +254,11 @@ pub fn mat2_comm(Mat2, Mat2) -> Mat2
 
 pub fn mat2_det(Mat2) -> Double
 
-pub fn mat2_id() -> Mat2
-
 pub fn mat2_inv(Mat2) -> Mat2
 
 pub fn mat2_mul(Mat2, Mat2) -> Mat2
 
 pub fn mat2_tr(Mat2) -> Double
-
-pub fn mat_get(Array[Double], Int32, Int32, Int32) -> Double
 
 pub fn mat_identity(Int32) -> Array[Double]
 
@@ -304,6 +298,8 @@ pub fn orbit_dim(Array[Int32]) -> Int32
 
 pub fn orbit_distance(SuperMassTensor, SuperMassTensor) -> Double
 
+pub fn order_harmonic(Array[Double], Int32) -> Double
+
 pub fn order_parameter(Array[Double]) -> Double
 
 pub fn parallel_transport(Array[Double], Array[Double], Array[Double], Double, Int32) -> Array[Double]
@@ -341,8 +337,6 @@ pub fn popcount(Int32) -> Int32
 pub fn pope_2d_score(Array[Double], Array[Double], Int32, Double) -> Double
 
 pub fn pope_coupling_weights(PolarPoPE, Int32) -> Array[Double]
-
-pub fn pope_frequencies(Int32, Double) -> Array[Double]
 
 pub fn pope_legendre_encoding(Int32, Int32) -> Array[Double]
 
@@ -402,8 +396,6 @@ pub fn term_to_string(Term) -> String
 
 pub fn torsion_norm(Array[Double], Int32) -> Double
 
-pub fn trace_coordinate_count(Int32, Int32, Int32) -> Int32
-
 pub fn transformed_connection(Array[Double], Array[Double], Int32) -> Array[Double]
 
 pub fn transpose(Array[Double], Int32, Int32) -> Array[Double]
@@ -451,15 +443,12 @@ pub(all) struct Cx {
   re : Double
   im : Double
 }
-pub fn Cx::to_text(Self) -> String
 
 pub(all) struct EisensteinDatum {
   rank : Int32
   lambda : Array[Double]
 }
-pub fn EisensteinDatum::amplitude(Self, Int32, Int32) -> Double
 pub fn EisensteinDatum::constant_term_matrix(Self) -> Array[Double]
-pub fn EisensteinDatum::eisenstein_multiplicity(Self, tol? : Double) -> Int32
 pub fn EisensteinDatum::projection_defect(Self) -> Double
 pub fn EisensteinDatum::projection_trace(Self) -> Double
 pub fn EisensteinDatum::scattering_det(Self) -> Double
@@ -557,7 +546,6 @@ pub fn LParameter::matrix(Self) -> Array[Double]
 pub fn LParameter::orbit_dim(Self) -> Int32
 pub fn LParameter::scalar_semisimple(Self, tol? : Double) -> Bool
 pub fn LParameter::semisimple_part(Self) -> Self
-pub fn LParameter::signature(Self) -> String
 
 pub(all) struct LanglandsConfig {
   agents : Int32

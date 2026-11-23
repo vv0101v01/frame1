@@ -187,13 +187,91 @@ pub fn Rng::range(self : Rng, lo : Double, hi : Double) -> Double {
 // ---------------------------------------------------------------------------
 
 ///|
-pub fn mat_get(a : Array[Double], n : Int32, i : Int32, j : Int32) -> Double {
-  a[i * n + j]
+pub fn mat_identity(n : Int32) -> Array[Double] {
+  Array::makei(n * n, fn(k) { if k / n == k % n { 1.0 } else { 0.0 } })
 }
 
 ///|
-pub fn mat_identity(n : Int32) -> Array[Double] {
-  Array::makei(n * n, fn(k) { if k / n == k % n { 1.0 } else { 0.0 } })
+/// Matrix-vector product `a·v` for an `n × n` row-major `a`.
+/// (Canonical location: every other module delegates here.)
+pub fn matvec(a : Array[Double], v : Array[Double], n : Int32) -> Array[Double] {
+  Array::makei(n, fn(i) {
+    let mut s = 0.0
+    for j in 0..<n {
+      s += a[i * n + j] * v[j]
+    }
+    s
+  })
+}
+
+///|
+/// Gaussian-elimination rank of an `r × c` matrix, with a relative pivot
+/// threshold.  Integer-valued matrices (the only ones used here) give exact
+/// ranks for any `tol < 1`.
+pub fn matrix_rank(
+  a_in : Array[Double],
+  r : Int32,
+  c : Int32,
+  tol~ : Double = 1.0e-9,
+) -> Int32 {
+  let a : Array[Double] = []
+  for i in 0..<(r * c) {
+    a.push(a_in[i])
+  }
+  let mut rank = 0
+  let mut row = 0
+  for col in 0..<c {
+    if row >= r {
+      break
+    }
+    // partial pivot
+    let mut best = row
+    let mut bestv = a[row * c + col].abs()
+    for i in (row + 1)..<r {
+      if a[i * c + col].abs() > bestv {
+        best = i
+        bestv = a[i * c + col].abs()
+      }
+    }
+    if bestv <= tol {
+      continue
+    }
+    if best != row {
+      for j in 0..<c {
+        let t = a[row * c + j]
+        a[row * c + j] = a[best * c + j]
+        a[best * c + j] = t
+      }
+    }
+    let piv = a[row * c + col]
+    for i in (row + 1)..<r {
+      let f = a[i * c + col] / piv
+      if f != 0.0 {
+        for j in col..<c {
+          a[i * c + j] -= f * a[row * c + j]
+        }
+      }
+    }
+    row += 1
+    rank += 1
+  }
+  rank
+}
+
+///|
+/// Nullity of an `r × c` matrix: `c - rank`.
+pub fn matrix_nullity(a : Array[Double], r : Int32, c : Int32) -> Int32 {
+  c - matrix_rank(a, r, c)
+}
+
+///|
+/// Products of matrices in the same `n × n` shape, `k` times.
+pub fn mat_power(a : Array[Double], n : Int32, k : Int32) -> Array[Double] {
+  let mut out = mat_identity(n)
+  for _ in 0..<k {
+    out = matrix_product(out, n, n, a, n)
+  }
+  out
 }
 
 ///|

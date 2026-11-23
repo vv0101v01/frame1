@@ -55,18 +55,14 @@ pub fn heat_cfl(kappa : Double, n : Int32) -> Double {
 }
 
 ///|
+/// Apply the (dense) graph Laplacian to `u`; a named alias of `matvec` kept
+/// for readability inside the PDE layer.
 pub fn laplacian_apply(
   l : Array[Double],
   u : Array[Double],
   n : Int32,
 ) -> Array[Double] {
-  Array::makei(n, fn(i) {
-    let mut s = 0.0
-    for j in 0..<n {
-      s += l[i * n + j] * u[j]
-    }
-    s
-  })
+  matvec(l, u, n)
 }
 
 ///|
@@ -181,16 +177,24 @@ pub fn kuramoto_step(
 }
 
 ///|
-/// Polar order parameter R = |⟨exp(iθ)⟩| (symmetry-breaking order).
-pub fn order_parameter(theta : Array[Double]) -> Double {
+/// Kuramoto-type order parameter of harmonic `k`:
+/// `r_k = |Σ_j e^{i k θ_j}| / n`.  `k = 1` is the usual phase coherence,
+/// `k = 2` the nematic (head-tail symmetric) coherence of module 07.
+pub fn order_harmonic(theta : Array[Double], harmonic : Int32) -> Double {
   let mut c = 0.0
   let mut s = 0.0
   for x in theta {
-    c += @math.cos(x)
-    s += @math.sin(x)
+    c += @math.cos(harmonic.to_double() * x)
+    s += @math.sin(harmonic.to_double() * x)
   }
   let n = theta.length().to_double()
   (c * c + s * s).sqrt() / n
+}
+
+///|
+/// Phase coherence `r_1` (special case of `order_harmonic`).
+pub fn order_parameter(theta : Array[Double]) -> Double {
+  order_harmonic(theta, 1)
 }
 
 ///|

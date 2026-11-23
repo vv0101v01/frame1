@@ -36,16 +36,24 @@ export PATH="$HOME/.moon/bin:$PATH"
 moon version --all
 ```
 
-## 2. 品質閘門（全部通過）
+## 2. 品質閘門（全部通過，一條指令）
 
 ```bash
-moon fmt --check
-moon check --deny-warn
-moon test --target wasm --deny-warn   # Total tests: 55, passed: 55, failed: 0
-moon test --target js   --deny-warn   # Total tests: 55, passed: 55, failed: 0
-moon build --target wasm
-moon run src/cmd/main          # 輸出 summary + CSV 軌跡
+./scripts/verify.sh
 ```
+
+它依序執行：`moon fmt` + `moon fmt --check` → `moon check --deny-warn` →
+`moon test --target wasm --deny-warn` → `moon test --target js --deny-warn`
+→ `moon build --target wasm` → 跑兩條管線 → 由 `scripts/extract_traces.py` 匯出 CSV
+→ 生成兩份 HTML 報告 → `scripts/dead_code_scan.py` 死碼掃描。
+
+| 檢查 | 結果 |
+| --- | --- |
+| `moon fmt --check` | no work to do |
+| `moon check --deny-warn` | 通過（0 warning） |
+| `moon test --target wasm --deny-warn` | `Total tests: 55, passed: 55, failed: 0` |
+| `moon test --target js --deny-warn` | `Total tests: 55, passed: 55, failed: 0` |
+| 死碼掃描 | 320 個定義、**0 個零引用定義** |
 
 ## 3. 專案結構
 
@@ -78,11 +86,17 @@ moonbit-superagent/
 │   ├── MOONBIT_0_10_SYNTAX.md    # 最新語法核查筆記（含來源）
 │   ├── report.html               # 第一輪自包含報告（內嵌 SVG）
 │   └── report_langlands.html     # 第二輪自包含報告（7 個內嵌 SVG 圖）
-├── scripts/install-moonbit.sh
+├── scripts/
+│   ├── install-moonbit.sh        # 官方 latest 通道 + SHA-256 驗證
+│   ├── verify.sh                 # 一鍵品質閘門（fmt/check/test/build/run/report/死碼）
+│   ├── extract_traces.py         # run_output.txt → 兩份 CSV（可重現）
+│   ├── dead_code_scan.py         # 零引用定義掃描（CI 化）
+│   ├── make_report.py            # 第一輪報告
+│   └── make_report_langlands.py  # 第二輪報告
 ├── emergence_trace.csv           # 第一輪：240 步軌跡
 ├── langlands_trace.csv           # 第二輪：200 步軌跡（9 欄）
-├── scripts/make_report_langlands.py
-└── run_output.txt                # 完整執行輸出（兩條管線）
+├── run_output.txt                # 完整執行輸出（兩條管線）
+└── .gitignore                    # 排除 _build/ 等衍生物
 ```
 
 ## 4. 一句話說明「怎麼把數學變成程式」
@@ -160,7 +174,27 @@ nilpotent orbits in GL_6 = 11
 視覺化：[`docs/report_langlands.html`](docs/report_langlands.html)（自包含，7 個內嵌 SVG：序參量、
 半單化、憑證對數圖、維度條形圖、常數項矩陣熱圖）。完整推導見 [`docs/LANGLANDS.md`](docs/LANGLANDS.md)。
 
-## 8. 限制
+## 8. 除錯／去重／減債（第三輪：收尾）
+
+完整紀錄見 [`docs/CLEANUP.md`](docs/CLEANUP.md)，摘要：
+
+* **清死碼 13 項**：`mat_get`、`legendre_deriv`、`pope_frequencies`、`Cx::to_text`、
+  `EisensteinDatum::{amplitude, eisenstein_multiplicity}`、`LParameter::signature`、
+  `mat2_id`、`trace_coordinate_count`、4 個 `_last_*` 變數。
+* **去重 11 組**：`matvec` 收斂到 `00_core`（`laplacian_apply`、`affine_map` 委派）、
+  `order_parameter`/`nematic_order` → `order_harmonic`、
+  `LParameter::matrix` → `eisenstein_local_system`、
+  `phi_functional_defect` → `c_reflection_defect`、`residue_at_one` → `c_pole_witness`、
+  權重對掃描 → `weight_pair_count`、Poisson 梯度 → `grad_at`、
+  `matrix_rank`/`matrix_nullity`/`mat_power` 移入 `00_core`。
+* **抓到 1 個真 bug**：把 `ker Θ` 的「權值重數」誤換成 `ad(h/2)` 的「權空間重數」，
+  被 T22c/T22d/T23d 三個測試立刻擋下（放大 `n` 倍）。
+* **減債**：`.gitignore`、`scripts/verify.sh`、`scripts/extract_traces.py`、
+  `scripts/dead_code_scan.py`、本節與 `docs/CLEANUP.md`。
+* 重構後 `src/` 由 6,172 行降到 6,094 行，測試仍 55 個全綠，
+  `emergence_trace.csv` / `langlands_trace.csv` 與重構前**逐位元相同**。
+
+## 9. 限制
 
 - Grassmann 纖維以 `Int32` 位元遮罩編碼，建議 `n ≤ 16`（`2^n` 個係數）。
 - 偶部具體化為雙曲上半平面 $\mathbb{H}^2$；更高維 `m` 只需擴充 `points` 與度量。

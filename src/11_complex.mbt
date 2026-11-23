@@ -140,13 +140,6 @@ pub fn cx_approx(a : Cx, b : Cx, tol~ : Double = 1.0e-9) -> Bool {
   approx(a.re, b.re, tol~) && approx(a.im, b.im, tol~)
 }
 
-///|
-///Printing helper.
-pub fn Cx::to_text(self : Cx) -> String {
-  let sign = if self.im < 0.0 { "-" } else { "+" }
-  "(" + self.re.to_string() + sign + self.im.abs().to_string() + "i)"
-}
-
 // ---------------------------------------------------------------------------
 // Gamma function (Lanczos, g = 7, 9 coefficients) and the completed zeta.
 // ---------------------------------------------------------------------------

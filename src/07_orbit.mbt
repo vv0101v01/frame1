@@ -133,16 +133,10 @@ pub fn orbit_distance(a : SuperMassTensor, b : SuperMassTensor) -> Double {
 }
 
 ///|
-/// |⟨exp(2iθ)⟩| computed directly from the phases (for cross-checking).
+/// Nematic (second harmonic) order parameter `r_2`: the head-tail symmetric
+/// coherence that a rank-2 tensor — not a vector — can detect.
 pub fn nematic_order(theta : Array[Double]) -> Double {
-  let mut c = 0.0
-  let mut s = 0.0
-  for x in theta {
-    c += @math.cos(2.0 * x)
-    s += @math.sin(2.0 * x)
-  }
-  let n = theta.length().to_double()
-  (c * c + s * s).sqrt() / n
+  order_harmonic(theta, 2)
 }
 
 ///|
