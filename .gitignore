@@ -1,0 +1,12 @@
+# MoonBit build artefacts
+_build/
+.mooncakes/
+target/
+*.wasm
+*.wat
+.moon-locks/
+
+# local tooling
+.moon/
+*.tmp
+.DS_Store
