@@ -1,5 +1,9 @@
 # 類智能體湧現的超幾何抽象 · MoonBit 0.10
 
+[![gate](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml/badge.svg)](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml)
+[![tests](https://img.shields.io/badge/tests-55%2F55%20wasm%20%2B%2055%2F55%20js-brightgreen)](#2-品質閘門全部通過一條指令)
+[![MoonBit](https://img.shields.io/badge/MoonBit-0.10.22-1f6feb)](https://www.moonbitlang.com/download)
+
 以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）與 [`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）。
 
 **第一輪（超幾何）**
@@ -54,6 +58,13 @@ moon version --all
 | `moon test --target wasm --deny-warn` | `Total tests: 55, passed: 55, failed: 0` |
 | `moon test --target js --deny-warn` | `Total tests: 55, passed: 55, failed: 0` |
 | 死碼掃描 | 320 個定義、**0 個零引用定義** |
+
+同一條閘門在 CI 上跑：[`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+（`ubuntu-latest`，用官方安裝器裝 MoonBit 並驗 SHA-256，跑 `scripts/verify.sh`，
+再把兩份 HTML 報告與兩份 CSV 當 artifact 上載）。
+
+CI 最後一步係 `git diff --exit-code`：因為 `run_output.txt`、CSV、報告全部係
+**由一次真跑衍生出嚟**嘅 artefact，只要數值有任何漂移，CI 就會紅。
 
 ## 3. 專案結構
 
