@@ -97,3 +97,47 @@ T23d: CT ∘ Eis = id，纖維 = 么冪軌道 (8 + 8 = 16)        → FAILED
 | 測試數 | 55 | 55（全綠，wasm + js） |
 | `--deny-warn` | 通過 | 通過 |
 | 輸出可重現性 | 手動切 CSV | `run_output.txt` → 腳本 → CSV，逐位元可重現 |
+
+## 7. 發佈（GitHub push）流程與現況
+
+**本機狀態：已完成**——`git init -b main`，三個有意義的 commit（不是一個「initial dump」）：
+
+```
+7fa2cf5 refactor: remove dead code, deduplicate shared logic, put the gate behind one script
+25ad8a6 feat(langlands): Eisenstein constant-term functor, non-semisimple L-parameters, G-hat operator, Betti moduli
+ab5eaf9 feat(core): MoonBit 0.10 supergeometry kernel for agent emergence
+```
+
+**發佈指令**（金鑰只出現在一次性 URL，不會寫入 `.git/config` 或任何被追蹤的檔案）：
+
+```bash
+GITHUB_PAT=github_pat_xxx ./scripts/push.sh          # 預設 vv0101v01/frame1, 分支 main
+```
+
+`scripts/push.sh` 推完之後會把 `origin` 重設成不含金鑰的
+`https://github.com/vv0101v01/frame1.git`。
+
+**目前卡在哪：PAT 權限不足（不是程式問題）**
+
+```
+remote: Permission to vv0101v01/frame1.git denied to vv0101v01.
+fatal: ... The requested URL returned error: 403
+```
+
+同樣金鑰打 `POST /repos/vv0101v01/frame1/git/refs` 的回應標頭是
+
+```
+x-accepted-github-permissions: contents=write
+{"message": "Resource not accessible by personal access token", "status": "403"}
+```
+
+即：token **認證成功**（辨識為 `vv0101v01`，repo 亦已存在且 `default_branch = main`、目前為空），
+但**只有讀取權限，缺少 `Contents: Read and write`**。修法（其一）：
+
+1. GitHub → Settings → Developer settings → Fine-grained tokens → 編輯該 token
+   → **Repository access** 要包含 `frame1` → **Permissions → Contents: Read and write**
+   （若之後要放 CI，再加 `Workflows: Read and write`）；
+2. 或者改用 classic token，勾 `repo` scope。
+
+改好之後重跑上面那行 `GITHUB_PAT=... ./scripts/push.sh` 即可；
+本地 commit、分支名、`.gitignore`、報告與 CSV 都已備妥，不需要重做任何計算。

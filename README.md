@@ -193,6 +193,8 @@ nilpotent orbits in GL_6 = 11
   `scripts/dead_code_scan.py`、本節與 `docs/CLEANUP.md`。
 * 重構後 `src/` 由 6,172 行降到 6,094 行，測試仍 55 個全綠，
   `emergence_trace.csv` / `langlands_trace.csv` 與重構前**逐位元相同**。
+* **發佈**：`GITHUB_PAT=… ./scripts/push.sh`（預設 `vv0101v01/frame1`、分支 `main`），
+  金鑰只走一次性 push URL、不落地。權限要求與現況見 `docs/CLEANUP.md` §7。
 
 ## 9. 限制
 
