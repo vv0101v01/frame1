@@ -98,11 +98,13 @@ T23d: CT ∘ Eis = id，纖維 = 么冪軌道 (8 + 8 = 16)        → FAILED
 | `--deny-warn` | 通過 | 通過 |
 | 輸出可重現性 | 手動切 CSV | `run_output.txt` → 腳本 → CSV，逐位元可重現 |
 
-## 7. 發佈（GitHub push）流程與現況
+## 7. 發佈（GitHub push）：已完成
 
-**本機狀態：已完成**——`git init -b main`，三個有意義的 commit（不是一個「initial dump」）：
+**本機狀態：已完成**——`git init -b main`，逐層可讀的 commit 歷史（不是一個「initial dump」）：
 
 ```
+9cf7b41 ci: single-job gate on GitHub Actions, plus executable bits on the scripts
+9c336a4 docs: record the publish procedure and the token permission diagnosis
 7fa2cf5 refactor: remove dead code, deduplicate shared logic, put the gate behind one script
 25ad8a6 feat(langlands): Eisenstein constant-term functor, non-semisimple L-parameters, G-hat operator, Betti moduli
 ab5eaf9 feat(core): MoonBit 0.10 supergeometry kernel for agent emergence
@@ -111,13 +113,66 @@ ab5eaf9 feat(core): MoonBit 0.10 supergeometry kernel for agent emergence
 **發佈指令**（金鑰只出現在一次性 URL，不會寫入 `.git/config` 或任何被追蹤的檔案）：
 
 ```bash
-GITHUB_PAT=github_pat_xxx ./scripts/push.sh          # 預設 vv0101v01/frame1, 分支 main
+GITHUB_PAT=ghp_xxx ./scripts/push.sh          # 預設 vv0101v01/frame1, 分支 main
 ```
 
 `scripts/push.sh` 推完之後會把 `origin` 重設成不含金鑰的
 `https://github.com/vv0101v01/frame1.git`。
 
-**目前卡在哪：PAT 權限不足（不是程式問題）**
+**結果：已推送成功**（2026-11-23）
+
+```
+* [new branch]      HEAD -> main
+```
+
+| 項目 | 值 |
+| --- | --- |
+| repo | <https://github.com/vv0101v01/frame1>（public，`default_branch = main`） |
+| HEAD | `9cf7b41` · 5 個 commit · 42 個追蹤檔案 |
+| 金鑰 | classic PAT（scope: `repo`, `workflow`）；只出現在一次性 push URL |
+| `.git/config` | 已確認**不含**任何 token（`origin` = 無金鑰 HTTPS） |
+
+上一版 fine-grained PAT 失敗的真正原因（留作紀錄）：token 認證成功、repo 讀得到，
+但 `POST /repos/.../git/refs` 回
+
+```
+x-accepted-github-permissions: contents=write
+{"message": "Resource not accessible by personal access token", "status": "403"}
+```
+
+即該 fine-grained token 缺 `Contents: Read and write`。classic PAT 帶 `repo` scope 即直接通過。
+
+## 8. CI（GitHub Actions）
+
+`.github/workflows/ci.yml`，workflow 名 `gate`，`ubuntu-latest`，單一 job：
+
+| # | step | 內容 |
+| --- | --- | --- |
+| 1 | Checkout | `actions/checkout@v4` |
+| 2 | Install MoonBit | `scripts/install-moonbit.sh "$MOON_VERSION"`（官方安裝器 + SHA-256 驗證） |
+| 3 | PATH | `$MOON_HOME/bin` 寫入 `$GITHUB_PATH` |
+| 4 | 版本 | `moon version --all` |
+| 5 | Quality gate | `scripts/verify.sh`（fmt / check --deny-warn / 55×2 測試 / build / 兩條管線 / CSV / 兩份報告 / 死碼掃描） |
+| 6 | 可重現性 | `git diff --exit-code`：衍生物若有任何數值漂移即紅燈 |
+| 7 | Artifact | `reports-and-traces`（兩份 HTML + 兩份 CSV + `run_output.txt`） |
+
+首次執行結果（push `9cf7b41`）：
+
+```
+run #1  completed  success  2026-11-23T11:13:41Z → 11:14:04Z（23 秒）
+step 6 Quality gate                         success
+step 7 Committed artefacts match a fresh run success
+artifact reports-and-traces                 56,431 bytes
+```
+
+<https://github.com/vv0101v01/frame1/actions/runs/45163251507>
+
+觸發條件：`push` 到 `main`、任何 `pull_request`、以及手動 `workflow_dispatch`；
+`concurrency` 會取消同一 ref 的舊 run。工具鏈通道由 `MOON_VERSION` 控制
+（預設 `latest`，釘死版本時填 `v0.10.22` 之類的 release id）。
+
+### 附：原先的診斷（保留作紀錄）
+
 
 ```
 remote: Permission to vv0101v01/frame1.git denied to vv0101v01.

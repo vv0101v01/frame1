@@ -66,6 +66,9 @@ moon version --all
 CI 最後一步係 `git diff --exit-code`：因為 `run_output.txt`、CSV、報告全部係
 **由一次真跑衍生出嚟**嘅 artefact，只要數值有任何漂移，CI 就會紅。
 
+首次執行（commit `9cf7b41`）：**run #1 全綠，23 秒，artifact 56 KB**
+— <https://github.com/vv0101v01/frame1/actions/runs/45163251507>
+
 ## 3. 專案結構
 
 ```
