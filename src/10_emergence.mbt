@@ -152,8 +152,19 @@ pub fn closure_certificate(mean_phase_ : Double, r : Double) -> Double {
 }
 
 ///|
-/// Run the full coupled flow and record the macroscopic observables.
+/// Run the full coupled flow and record the macroscopic observables
+/// (Round-1 topology: ring + PoPE, see `CouplingGraph::ring_pope`).
 pub fn run_emergence(cfg : EmergenceConfig) -> EmergenceTrace {
+  run_emergence_on(cfg, CouplingGraph::ring_pope(cfg.n, cfg.base))
+}
+
+///|
+/// The same coupled flow on an arbitrary agent topology `g` (module 25):
+/// Kuramoto, Fisher-belief and symbolic-neural consensus all use `g`.
+pub fn run_emergence_on(
+  cfg : EmergenceConfig,
+  g : CouplingGraph,
+) -> EmergenceTrace {
   let n = cfg.n
   let k = cfg.categories
   let rng = Rng::new(cfg.seed)
@@ -174,9 +185,6 @@ pub fn run_emergence(cfg : EmergenceConfig) -> EmergenceTrace {
     )
     hybrids.push(h.canonical())
   }
-  // PoPE-derived translation-equivariant coupling
-  let kernel = PolarPoPE::new(8, cfg.base)
-  let weights = pope_coupling_weights(kernel, n)
   let dt = 0.05
   let steps = cfg.steps
   let order = Array::make(steps + 1, 0.0)
@@ -197,15 +205,13 @@ pub fn run_emergence(cfg : EmergenceConfig) -> EmergenceTrace {
   jacobi_defect[0] = closure_certificate(mean_phase(theta), order[0])
   for t in 1..<=steps {
     // (1) nonlinear PDE flow: Kuramoto with PoPE weights
-    theta = kuramoto_step(theta, omega, weights, cfg.coupling, dt)
+    theta = kuramoto_step_graph(theta, omega, g, cfg.coupling, dt)
     // (2) Fisher-natural-gradient belief consensus with the neighbour mean
     let mean_p = belief_mean(beliefs)
     let mut grad_norm = 0.0
     for i in 0..<n {
-      let left = beliefs[(i - 1 + n) % n]
-      let right = beliefs[(i + 1) % n]
       let p = beliefs[i]
-      let q = vec_scale(vec_add(left, right), 0.5)
+      let q = g.neighbour_mean(i, beliefs)
       // score towards the neighbour/population consensus (linearised KL)
       let g = Array::makei(k, fn(j) { 0.5 * q[j] + 0.5 * mean_p[j] - p[j] })
       let ng = natural_gradient_cg(p, g, 0.5, 20)
@@ -216,7 +222,7 @@ pub fn run_emergence(cfg : EmergenceConfig) -> EmergenceTrace {
     }
     fisher_grad[t] = grad_norm / n.to_double()
     // (3) chaotic symbolic-neural unification on the agent graph
-    cur_h = consensus_unification(cur_h, 1, eta=0.5)
+    cur_h = consensus_unification_graph(g, cur_h, 1, eta=0.5)
     // (4) emergent observables from the second-order super-mass tensor
     final_mass = SuperMassTensor::from_phases(theta)
     order[t] = order_parameter(theta)
@@ -239,8 +245,8 @@ pub fn run_emergence(cfg : EmergenceConfig) -> EmergenceTrace {
     connes_distance: emergent_metric_radius(cfg.coupling),
     final_berezinian: final_mass.berezinian(),
     orbit_eigenvalues: final_mass.canonical_form(),
-    lambda2: algebraic_connectivity(n),
-    cfl: heat_cfl(cfg.kappa, n),
+    lambda2: g.lambda2,
+    cfl: g.heat_cfl(cfg.kappa),
     final_mass,
   }
 }

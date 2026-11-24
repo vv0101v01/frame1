@@ -105,6 +105,8 @@ pub fn connection_action(Array[Double], Array[Double], Array[Double], Int32) -> 
 
 pub fn consensus_unification(Array[Hybrid], Int32, eta? : Double) -> Array[Hybrid]
 
+pub fn consensus_unification_graph(CouplingGraph, Array[Hybrid], Int32, eta? : Double) -> Array[Hybrid]
+
 pub fn conservativity_defect(Int32, Int32, Array[Int32], Int32) -> Int32
 
 pub fn constant_term_laplacian(Double, Double, h? : Double) -> Double
@@ -116,6 +118,8 @@ pub fn constant_term_numeric(Double, Double, Int32, Int32) -> Double
 pub fn constant_term_sl2(Double, Double) -> Double
 
 pub fn coroot(Array[Double]) -> Array[Double]
+
+pub fn cosine_matrix(Array[Array[Double]]) -> Array[Double]
 
 pub fn coxeter_length(RootType, Array[Double]) -> Int32
 
@@ -176,6 +180,8 @@ pub fn cx_zero() -> Cx
 pub fn decide_conservatively(Formula, Int32, Int32, Array[Int32], max_size? : Int32) -> Bool
 
 pub fn decide_reference(Formula, Int32, Array[Int32]) -> Bool
+
+pub fn decode_hex_embeddings(Array[String]) -> Array[Array[Double]]
 
 pub fn default_config() -> EmergenceConfig
 
@@ -307,6 +313,8 @@ pub fn gram_is_toeplitz(Array[Double], Int32) -> Bool
 
 pub fn gram_min_eigenvalue(Array[Double], Int32) -> Double
 
+pub fn graph_components(Array[Double], Int32) -> Array[Int32]
+
 pub fn grothendieck_cardinal(Int32) -> Cardinal
 
 pub fn grothendieck_universe(Int32) -> GrothendieckUniverse
@@ -316,6 +324,14 @@ pub fn heat_cfl(Double, Int32) -> Double
 pub fn heat_flow(Array[Double], Array[Double], Double, Int32, Int32, safety? : Double) -> HeatTrace
 
 pub fn heat_step(Array[Double], Array[Double], Double, Double, Int32) -> Array[Double]
+
+pub let hexad_agent_model : Array[Int32]
+
+pub fn hexad_config() -> EmergenceConfig
+
+pub fn hexad_lfm_graph(k? : Int32, tau? : Double) -> CouplingGraph
+
+pub let hexad_lfm_hex : Array[String]
 
 pub fn hf_big_union(Int32) -> Int32
 
@@ -371,9 +387,13 @@ pub fn koszul_sign64(UInt64, UInt64) -> Double
 
 pub fn kuramoto_derivative(Array[Double], Array[Double], Array[Double], Double) -> Array[Double]
 
+pub fn kuramoto_derivative_graph(Array[Double], Array[Double], CouplingGraph, Double) -> Array[Double]
+
 pub fn kuramoto_flow(Array[Double], Array[Double], Array[Double], Double, Double, Int32) -> SyncTrace
 
 pub fn kuramoto_step(Array[Double], Array[Double], Array[Double], Double, Double) -> Array[Double]
+
+pub fn kuramoto_step_graph(Array[Double], Array[Double], CouplingGraph, Double, Double) -> Array[Double]
 
 pub fn l_parameter(Array[Int32], Array[Double]) -> LParameter
 
@@ -444,6 +464,8 @@ pub fn matrix_rank(Array[Double], Int32, Int32, tol? : Double) -> Int32
 pub fn matrix_trace(Array[Double], Int32) -> Double
 
 pub fn matvec(Array[Double], Array[Double], Int32) -> Array[Double]
+
+pub fn max_of(Array[Double]) -> Double
 
 pub fn mean_kl_to_population(Array[Array[Double]]) -> Double
 
@@ -609,7 +631,11 @@ pub fn rotation(Double) -> Array[Double]
 
 pub fn run_emergence(EmergenceConfig) -> EmergenceTrace
 
+pub fn run_emergence_on(EmergenceConfig, CouplingGraph) -> EmergenceTrace
+
 pub fn run_frontier_emergence(agents? : Int32, steps? : Int32, seed? : Int32) -> FrontierTrace
+
+pub fn run_hexad_comparison(steps? : Int32) -> HexadComparison
 
 pub fn run_langlands(LanglandsConfig) -> LanglandsTrace
 
@@ -646,6 +672,8 @@ pub fn super_jacobiator(GradedElement, GradedElement, GradedElement) -> GradedEl
 pub fn super_jacobiator_m(SuperMatrix, SuperMatrix, SuperMatrix) -> SuperMatrix
 
 pub fn sylvester_sigma(SuperMatrix, Int32) -> Double
+
+pub fn sym_eigenvalues(Array[Double], Int32, sweeps? : Int32) -> Array[Double]
 
 pub fn symplectic_form(Int32) -> Array[Double]
 
@@ -769,6 +797,23 @@ pub(all) struct CohComplex {
   twist : Int32
 }
 
+pub(all) struct CouplingGraph {
+  n : Int32
+  kind : String
+  nbr : Array[Array[Int32]]
+  wt : Array[Array[Double]]
+  kuramoto : Array[Double]
+  laplacian : Array[Double]
+  lambda2 : Double
+  lambda_max : Double
+}
+pub fn CouplingGraph::degree(Self, Int32) -> Double
+pub fn CouplingGraph::edge_count(Self) -> Int32
+pub fn CouplingGraph::heat_cfl(Self, Double) -> Double
+pub fn CouplingGraph::knn(Array[Array[Double]], Array[Int32], k? : Int32, tau? : Double) -> Self
+pub fn CouplingGraph::neighbour_mean(Self, Int32, Array[Array[Double]]) -> Array[Double]
+pub fn CouplingGraph::ring_pope(Int32, Double) -> Self
+
 pub(all) struct Cx {
   re : Double
   im : Double
@@ -876,6 +921,15 @@ pub(all) struct HeatTrace {
   state : Array[Double]
   dt : Double
 }
+
+pub(all) struct HexadComparison {
+  ring : EmergenceTrace
+  knn : EmergenceTrace
+  graph : CouplingGraph
+  cross_edges : Int32
+}
+pub fn HexadComparison::csv(Self) -> String
+pub fn HexadComparison::summary(Self) -> String
 
 pub(all) struct Hybrid {
   term : Term

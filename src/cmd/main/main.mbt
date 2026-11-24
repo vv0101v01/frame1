@@ -29,4 +29,13 @@ fn main {
   println("# BEGIN_CSV_UNIVERSE")
   println(utr.csv())
   println("# END_CSV_UNIVERSE")
+  // ---- fifth pipeline: frame1-Hexad, 128 agents x 640 steps, ring vs LFM k-NN
+  let hx = @geo.run_hexad_comparison()
+  println(
+    "# hexad-emergence / 128 agents x 640 steps / ring vs LFM2.5-Embedding k-NN",
+  )
+  println(hx.summary())
+  println("# BEGIN_CSV_HEXAD")
+  println(hx.csv())
+  println("# END_CSV_HEXAD")
 }

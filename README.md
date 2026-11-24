@@ -1,7 +1,8 @@
 # 類智能體湧現的超幾何抽象 · MoonBit 0.10
 
 [![gate](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml/badge.svg)](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-82%2F82%20wasm%20%2B%2082%2F82%20js-brightgreen)](#2-品質閘門全部通過一條指令)
+[![tests](https://img.shields.io/badge/tests-87%2F87%20wasm%20%2B%2087%2F87%20js-brightgreen)](#2-品質閘門全部通過一條指令)
+[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-frame1--hexad-yellow)](https://huggingface.co/spaces/Transynergy/frame1-hexad)
 [![MoonBit](https://img.shields.io/badge/MoonBit-0.10.22-1f6feb)](https://www.moonbitlang.com/download)
 
 以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）、[`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）與 [`docs/FRONTIER.md`](docs/FRONTIER.md)（第三輪前沿擴充與限制消除，T25–T34 / A21–A28）。
@@ -51,20 +52,20 @@ moon version --all
 
 它依序執行：`moon fmt` + `moon fmt --check` → `moon check --deny-warn` →
 `moon test --target wasm --deny-warn` → `moon test --target js --deny-warn`
-→ `moon build --target wasm` → 跑四條管線 → 由 `scripts/extract_traces.py` 匯出 CSV
+→ `moon build --target wasm` → 跑五條管線（第五條：Hexad ring vs LFM k-NN） → 由 `scripts/extract_traces.py` 匯出五份 CSV
 → 生成四份 HTML 報告 → `scripts/dead_code_scan.py` 死碼掃描。
 
 | 檢查 | 結果 |
 | --- | --- |
 | `moon fmt --check` | no work to do |
 | `moon check --deny-warn` | 通過（0 warning） |
-| `moon test --target wasm --deny-warn` | `Total tests: 82, passed: 82, failed: 0` |
-| `moon test --target js --deny-warn` | `Total tests: 82, passed: 82, failed: 0` |
-| 死碼掃描 | 562 個定義、**0 個零引用定義** |
+| `moon test --target wasm --deny-warn` | `Total tests: 87, passed: 87, failed: 0` |
+| `moon test --target js --deny-warn` | `Total tests: 87, passed: 87, failed: 0` |
+| 死碼掃描 | 584 個定義（29 個檔案）、**0 個零引用定義** |
 
 同一條閘門在 CI 上跑：[`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 （`ubuntu-latest`，用官方安裝器裝 MoonBit 並驗 SHA-256，跑 `scripts/verify.sh`，
-再把四份 HTML 報告與四份 CSV trace 當 artifact 上載）。
+再把四份 HTML 報告與五份 CSV trace（含 `hexad_trace.csv`）當 artifact 上載）。
 
 CI 最後一步係 `git diff --exit-code`：因為 `run_output.txt`、CSV、報告全部係
 **由一次真跑衍生出嚟**嘅 artefact，只要數值有任何漂移，CI 就會紅。
@@ -104,12 +105,18 @@ moonbit-superagent/
 │   ├── 22_langlands_universe.mbt            # 第四輪：beth 梯、朗蘭茲三元分層、Newton 層（T39–T41 / A32–A34）
 │   ├── 23_elladic_diamonds.mbt              # 第四輪：tilting、Div¹、ℓ-進光滑層、幾何 Satake（T42–T45 / A35–A37）
 │   ├── 24_universe_frontier.mbt             # 第四輪：四通道耦合宇宙湧現管線、T46 交換憑證
-│   └── cmd/main/                            # 可執行範例（四條管線，尾聲輸出 universe CSV）
+│   ├── 25_knn_graph.mbt                     # 第五輪：CouplingGraph（ring_pope / LFM k-NN）、A38 Jacobi 全譜、A39 建圖、T47
+│   ├── 26_lfm_agent_embeddings.mbt          # 第五輪：128 × 1024 int8 LFM2.5 向量（生成檔，勿手改）
+│   ├── 27_hexad_emergence.mbt               # 第五輪：128 agents × 640 steps ring vs k-NN 對照（T48）
+│   └── cmd/main/                            # 可執行範例（五條管線，尾聲輸出 hexad CSV）
 ├── docs/
 │   ├── THEORY.md                 # 第一輪：定理 T1–T15、演算法 A1–A12
 │   ├── LANGLANDS.md              # 第二輪：定理 T16–T24、演算法 A13–A20
 │   ├── FRONTIER.md               # 第三輪：限制消除、定理 T25–T34、演算法 A21–A28
 │   ├── UNIVERSE.md               # 第四輪：定理 T35–T46、演算法 A29–A37
+│   ├── HEXAD_6IN1_PLAN.md        # 第五輪：五模型「6 合 1」計劃、融合、單模型路線、HF Space（§1–14）
+│   ├── HEXAD_BASELINE_128x640.txt# 第五輪：128×640 骨架基線
+│   ├── HEXAD_VOCAB_OVERLAP.txt   # 第五輪：五個 tokenizer 詞表重疊 / 同 span 率
 │   ├── MOONBIT_0_10_SYNTAX.md    # 最新語法核查筆記（含 0.10.22 硬體位元與 SortedMap 特性）
 │   ├── report.html               # 第一輪自包含報告（內嵌 SVG）
 │   ├── report_langlands.html     # 第二輪自包含報告（7 個內嵌 SVG 圖）
@@ -117,8 +124,9 @@ moonbit-superagent/
 │   └── report_universe.html      # 第四輪宇宙管線報告（內嵌 SVG，由 make_report_universe.py 生成）
 ├── scripts/
 │   ├── install-moonbit.sh        # 官方 latest 通道 + SHA-256 驗證
-│   ├── verify.sh                 # 一鍵品質閘門（fmt/check/test/build/run/4份報告/死碼）
-│   ├── extract_traces.py         # run_output.txt → 四份 CSV（可重現）
+│   ├── verify.sh                 # 一鍵品質閘門（fmt/check/test/build/run/5份CSV/4份報告/死碼）
+│   ├── extract_traces.py         # run_output.txt → 五份 CSV（可重現）
+│   ├── hexad/                    # embed_agents.py（角色卡 → LFM 向量 → module 26）、vocab_overlap.py、agents.json
 │   ├── dead_code_scan.py         # 零引用定義掃描（CI 化）
 │   ├── make_report.py            # 第一輪報告
 │   ├── make_report_langlands.py  # 第二輪報告
@@ -128,7 +136,9 @@ moonbit-superagent/
 ├── langlands_trace.csv           # 第二輪：201 步軌跡（9 欄）
 ├── frontier_trace.csv            # 第三輪：121 步軌跡（M^{4|32} + B_2 Adelic + SL_3 Oper + AD）
 ├── universe_trace.csv            # 第四輪：41 步軌跡（11 欄，含 Σ-index 與反射界 β）
-└── run_output.txt                # 完整執行輸出（四條管線）
+├── hexad_trace.csv               # 第五輪：641 步 ring vs LFM k-NN（R、belief/concept 散度、KL）
+├── space/                        # Hugging Face Space 原始碼（Gradio + ZeroGPU，見第 12 節）
+└── run_output.txt                # 完整執行輸出（五條管線）
 └── .gitignore                    # 排除 _build/ 等衍生物
 ```
 
@@ -256,5 +266,30 @@ nilpotent orbits in GL_6 = 11
 | `24_universe_frontier.mbt` | 四通道耦合 `run_universe_emergence(steps=40, levels=4)`：宇宙階梯 + Σₙ 反射 + excursion 譜 + ℓ-進光滑性；`UniverseTrace::csv` | T46 反射／Verdier 對偶交換，max defect 9.77×10⁻¹⁵ | `power_sums_of`, `duality_commutation_defect` |
 
 管線憑證（`steps = 12` 的證書測試）：13 行 CSV、欄寬 11、全部缺陷 `< 1e-9`、`tilt_chains == 8`、摘要含 `T35/T37/T40/T42/T44/T46`。完整軌跡見 `universe_trace.csv`（41 步）。
+
+## 11. 第五輪：frame1-Hexad 耦合圖（128 agents × 640 steps）
+
+`ring_laplacian` 已抽象成 `CouplingGraph`（`src/25_knn_graph.mbt`）。第一輪 ring 以 `CouplingGraph::ring_pope` 逐位元重現（T47）；新增由**真 LFM2.5-Embedding-350M 向量**（`src/26_lfm_agent_embeddings.mbt`，由 `scripts/hexad/embed_agents.py` 生成）建立嘅 k-NN + 跨家族橋圖拉普拉斯（A38 Jacobi 全譜、A39 建圖）。`src/27_hexad_emergence.mbt` 以 128×640 對照（T48，`hexad_trace.csv`）：
+
+| | ring | LFM k-NN |
+|---|---|---|
+| λ₂ | 0.00241 | **0.540** |
+| 概念散度 (T) | 0.0103 | **2.2e-10** |
+| R > 0.99 步數 | 90 | 279 |
+
+詳見 [`docs/HEXAD_6IN1_PLAN.md`](docs/HEXAD_6IN1_PLAN.md) §11–13。
+
+## 12. 第五輪實機：Hugging Face Space（五個模型同場）
+
+🤗 **<https://huggingface.co/spaces/Transynergy/frame1-hexad>**（ZeroGPU，原始碼喺 [`space/`](space/)）
+
+| 分頁 | 做咩 | 實測 |
+|---|---|---|
+| 路由 + 共識 | LFM 對 128 張角色卡做 top-16 投票，選出模型生成；`\boxed{}` 多數票，否則揀 LFM medoid | 「2024 有幾多個因數」：Limite + K2 都係 `\boxed{16}` → 多數票，35 s |
+| Limite ⊕ R1 融合 | 共享 151 643 個 id 嘅 token 級 product / mixture 解碼，加 budget forcing | 7¹⁰⁰ mod 13 → 9，top-1 一致率 86% |
+| 耦合圖 | module 25 嘅 numpy 版 | 逐位元重現 1275 條邊 / 489 條跨家族 / λ₂ = 0.540 |
+| 診斷 | HF transformers 版 LFM 對 llama.cpp Q8_0 | cos 0.9996、相似度矩陣 r = 0.9999 |
+
+速度：K2 60 · R1 67 · Qwen3.5 39 · Limite 32 tok/s；融合約 10 tok/s。成本：ZeroGPU creator 免費，用 PRO 每日 40 分鐘額度。詳見計劃 §14。
 
 授權：Apache-2.0。

@@ -23,6 +23,7 @@ BLOCKS = [
     ("# BEGIN_CSV_LANG", "# END_CSV_LANG", "langlands_trace.csv"),
     ("# BEGIN_CSV_FRONTIER", "# END_CSV_FRONTIER", "frontier_trace.csv"),
     ("# BEGIN_CSV_UNIVERSE", "# END_CSV_UNIVERSE", "universe_trace.csv"),
+    ("# BEGIN_CSV_HEXAD", "# END_CSV_HEXAD", "hexad_trace.csv"),
 ]
 
 

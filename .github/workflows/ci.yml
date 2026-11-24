@@ -1,7 +1,8 @@
 name: gate
 
 # The whole quality gate in one job: formatting, warnings-as-errors type
-# checking, the 82-test suite on both backends, the executable, the exported
+# checking, the 87-test suite on both backends, the executable (five
+# pipelines, incl. the Hexad ring-vs-LFM-k-NN comparison), the exported
 # CSV traces, all four HTML reports, and the (strict) dead-code scan.
 #
 # We also assert that everything the run produces is byte-identical to what is
@@ -65,4 +66,5 @@ jobs:
             langlands_trace.csv
             frontier_trace.csv
             universe_trace.csv
+            hexad_trace.csv
             run_output.txt
