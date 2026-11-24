@@ -180,16 +180,6 @@ pub(all) struct GradedElement {
 }
 
 ///|
-pub fn GradedElement::zero(n : Int32, deg : Int32) -> GradedElement {
-  GradedElement::{ deg, num: SuperNumber::zero(n), }
-}
-
-///|
-pub fn GradedElement::one(n : Int32) -> GradedElement {
-  GradedElement::{ deg: 0, num: SuperNumber::one(n), }
-}
-
-///|
 pub fn GradedElement::theta(n : Int32, i : Int32) -> GradedElement {
   GradedElement::{ deg: 1, num: SuperNumber::theta(n, i), }
 }

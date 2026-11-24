@@ -196,3 +196,18 @@ x-accepted-github-permissions: contents=write
 
 改好之後重跑上面那行 `GITHUB_PAT=... ./scripts/push.sh` 即可；
 本地 commit、分支名、`.gitignore`、報告與 CSV 都已備妥，不需要重做任何計算。
+
+## 8. 第四輪（Round 4）：module-21 重寫、新增定義的死碼封堵
+
+| 項目 | 做法 | 結果 |
+|---|---|---|
+| `reflects_on` / `reflection_bound`（強反射） | 刪除：對有限 `V_α` 恆回 0（Montague–Lévy 需 α ≥ ω；Σ₀ 唯一絕對層），屬「看似有內容實則虛無」的死邏輯 | `src/21_universe_reflection.mbt` 重寫，改用參數相對 `reflects_for(β,α,n,params,…)` / `reflection_bound_for(α,n,params,…)` |
+| `formula_pool` | 補回原子 `x_i ∈ x_i`（`Mem(i,i)`），否則 `nvars = 1` 時池為空，反射測試退化為真空 | 池大小 4/15/30/205，T37/T38 斷言有據 |
+| `hf_in_level` / `hf_rank` | 掃描器曾標記為 dead → 寫入 T35/T36 宇宙閉包斷言作為正規引用 | 被常規使用，不再被 flag |
+| 新增定義 21/24 | `reflects_for`、`reflection_bound_for`、`reflected_dual`、`reflected_of_inverse`、`duality_commutation_defect`、`power_sums_of` | 全部從 `test` 區塊（T35–T46 與 pipeline certificate）引用 |
+| `satake_weight_of_ic`（23） | 刪除無用函式，將其斷言改為 `satake_perverse_degree(c3, cw1) == 6` | 無行為遺失 |
+| 格式化與警告 | `moon fmt` 嚴格；`moon check --deny-warn` 清淨 | 0 warnings |
+| 測試 | `moon test --target wasm --deny-warn` 82/82；`--target js --deny-warn` 82/82 | 0 failed |
+| 死碼掃描 | `scripts/dead_code_scan.py`：562 個定義，0 個死 | 封鎖 CI |
+
+第四輪新增 416 → 562 定義皆有引用，`universe_trace.csv`（41 行、11 欄）與 `docs/report_universe.html` 由管線真跑衍生；`scripts/verify.sh` 與 `.github/workflows/ci.yml` 已延伸至第四輪報告與 trace（見 README §2、§10）。

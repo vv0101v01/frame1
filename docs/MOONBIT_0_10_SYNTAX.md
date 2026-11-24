@@ -216,3 +216,21 @@ assert_true(tr.rows.length() == cfg.steps.to_int() + 1)
 // CSV 解析（測試內）
 tr.rows[0].split(",").collect().length()
 ```
+
+---
+
+## 12. 第三輪前沿擴充核查（2026-11-24）：`moonc v0.10.22+124d61d05` 原生硬體與最新標準庫特性
+
+核查日期：2026-11-24（Asia/Hong_Kong），SHA-256（`moonbit-linux-x86_64.tar.gz`）：`aeb78ded1d5e25185ed788328cacef5e843a9ab923145523b7652e8d082f74fb`。
+
+本輪從 `~/.moon/lib/core/CHANGELOG.md` 與官方 Updates 挖掘並實測落地的 **MoonBit 0.10.19–0.10.22 最新語法與標準庫特性**：
+
+1. **硬體位元內建指令（`%i32_popcnt`, `%u64.popcnt`, `%u64.ctz`）**：
+   `Int32::popcnt()`、`UInt64::popcnt()`、`UInt64::ctz()` 直接編譯為 Wasm/Native 底層位元指令，讓 `koszul_sign64` 只需迭代非零位元 `m = m & (m - 1UL)`（`17_sparse_super_m_n.mbt`）。
+2. **`Double::total_compare`（IEEE-754 全序比較）**：
+   消除 0.10.19 起 `compare` 遇 `NaN` 未定義的風險，實作 `sort_total` 並用於 `Hybrid::canonical` 軌道投影（`00_core.mbt`, `09_unify.mbt`）。
+3. **`@sorted_map.SortedMap` 有界區間導航 `range_bounds` + `@cmp.Bound` + `for k, v in map`（`Iter2` 模式解構）**：
+   0.10.22 新增 `@cmp.Bound::{Included, Excluded, Unbounded}` 與 `SortedMap::range_bounds`，配合 0.10.14+ 的 `for mask, v in self.terms.range_bounds(@cmp.Bound::Excluded(0UL), @cmp.Bound::Unbounded)` 直接跳過 `0UL`（body 項）掃描稀疏靈魂（`17_sparse_super_m_n.mbt`）。
+4. **結構展開更新語法 `{ ..base_struct, field: new_val }`**：
+   於複數 `SL_2(C)` 矩陣構造 `Mat2Cx`（`19_opers_nonabelian_hodge.mbt`）無痛更新行列式正規化欄位。
+5. **非同步標準庫遷移備忘**：`moonbitlang/core/async` 已併入標準庫（需 `allow-experimental-packages = true`）；管道語法已棄用 `x |> fn(y) { ... }`，統一改用 `x |> y => { ... }`。

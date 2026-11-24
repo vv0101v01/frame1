@@ -256,11 +256,11 @@ pub fn Hybrid::new(term : Term, vec : Array[Double]) -> Hybrid {
 }
 
 ///|
-/// Closure operator: normal form + projection to the orbit space R^d/S_d.
+/// Closure operator: normal form + projection to the orbit space R^d/S_d
+/// using IEEE-754 total order (`Double::total_compare`).
 pub fn Hybrid::canonical(self : Hybrid) -> Hybrid {
   let nf = rewrite_fix(self.term, 64)
-  let v = self.vec.copy()
-  v.sort()
+  let v = sort_total(self.vec)
   Hybrid::{ term: nf, vec: v, subst: self.subst, }
 }
 

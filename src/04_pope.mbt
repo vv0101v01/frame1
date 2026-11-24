@@ -151,13 +151,15 @@ pub fn legendre_jacobi(n : Int32) -> Array[Double] {
 }
 
 ///|
-/// det(J - x I), used to certify spec(J) = roots of P_N.
+/// `det(J - x I)`, used to certify `spec(J) = roots of P_N`.
+/// Delegates to the shared monic evaluator: `det(J - xI) = (-1)^n det(xI - J)`.
 pub fn char_poly_at(j : Array[Double], n : Int32, x : Double) -> Double {
-  let m = j.copy()
-  for i in 0..<n {
-    m[i * n + i] -= x
+  let monic = char_poly_monic(j, n, x)
+  if n % 2 == 0 {
+    monic
+  } else {
+    -monic
   }
-  determinant(m, n)
 }
 
 ///|

@@ -301,14 +301,7 @@ pub fn ct_eis_defect(blocks : Array[Int32], values : Array[Double]) -> Double {
   let n = partition_sum(blocks)
   let eis = eisenstein_local_system(blocks, values)
   let ct = constant_term_local_system(eis, n)
-  let mut worst = 0.0
-  for i in 0..<n {
-    let d = (ct[i * n + i] - values[i]).abs()
-    if d > worst {
-      worst = d
-    }
-  }
-  worst
+  vec_inf_diff(Array::makei(n, fn(i) { ct[i * n + i] }), values)
 }
 
 ///|

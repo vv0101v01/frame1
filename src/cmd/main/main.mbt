@@ -17,4 +17,16 @@ fn main {
   println("# BEGIN_CSV_LANG")
   println(ltr.csv())
   println("# END_CSV_LANG")
+  // ---- third pipeline: Frontier synthesis (M^{4|32} + B_2 Adelic + Oper + AD)
+  let ftr = @geo.run_frontier_emergence()
+  println(ftr.summary)
+  println("# BEGIN_CSV_FRONTIER")
+  println(ftr.csv())
+  println("# END_CSV_FRONTIER")
+  // ---- fourth pipeline: Grothendieck universes x Langlands x l-adic diamonds
+  let utr = @geo.run_universe_emergence()
+  println(utr.summary)
+  println("# BEGIN_CSV_UNIVERSE")
+  println(utr.csv())
+  println("# END_CSV_UNIVERSE")
 }

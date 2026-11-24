@@ -2,7 +2,7 @@
 
 > 目標：把「數學名詞」變成「可執行的數學結構」，再從抽象本身（而不是從外部硬套）導出定律、定理與演算法，最後用於類智能體湧現（agent-like emergence）。
 >
-> 所有定理都附有 MoonBit 0.10 的可執行憑證：`moon test --deny-warn` 共 35 個測試全部通過。檔案錨點格式為 `src/xx.mbt :: 函式名 / test 名稱`。
+> 所有定理都附有 MoonBit 0.10 的可執行憑證：`moon test --deny-warn` 共 82 個測試全部通過（wasm + js，0 warnings）。檔案錨點格式為 `src/xx.mbt :: 函式名 / test 名稱`。第四輪（T35–T46 / A29–A37）詳見 [`docs/UNIVERSE.md`](UNIVERSE.md)。
 
 ---
 

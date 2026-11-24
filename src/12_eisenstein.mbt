@@ -233,10 +233,7 @@ pub fn EisensteinDatum::constant_term_matrix(
 ) -> Array[Double] {
   let ws = weyl_group(self.rank)
   let n = ws.length()
-  let m : Array[Double] = []
-  for _ in 0..<(n * n) {
-    m.push(0.0)
-  }
+  let m = Array::make(n * n, 0.0)
   for a in 0..<n {
     let u = ws[a]
     for b in 0..<n {
@@ -271,14 +268,7 @@ pub fn EisensteinDatum::projection_defect(self : EisensteinDatum) -> Double {
   let n = weyl_group(self.rank).length()
   let p = self.spectral_projection()
   let p2 = matrix_product(p, n, n, p, n)
-  let mut worst = 0.0
-  for i in 0..<(n * n) {
-    let d = (p2[i] - p[i]).abs()
-    if d > worst {
-      worst = d
-    }
-  }
-  worst
+  vec_inf_diff(p2, p)
 }
 
 ///|
@@ -461,11 +451,7 @@ test "T20: constant-term matrix is |W| times a rank-one projection" {
     // A itself is not a projection: A² = |W|·A ≠ A.
     let a = d.constant_term_matrix()
     let a2 = matrix_product(a, n, n, a, n)
-    let mut diff = 0.0
-    for i in 0..<(n * n) {
-      diff += (a2[i] - n.to_double() * a[i]).abs()
-    }
-    assert_true(diff < 1.0e-8)
+    assert_true(vec_inf_diff(a2, vec_scale(a, n.to_double())) < 1.0e-8)
     // diagonal amplitudes are 1
     for i in 0..<n {
       assert_true((a[i * n + i] - 1.0).abs() < 1.0e-12)

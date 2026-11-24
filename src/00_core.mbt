@@ -34,12 +34,6 @@ pub fn GradedDim::super_dimension(self : GradedDim) -> Int32 {
 }
 
 ///|
-/// Total dimension of the underlying vector space.
-pub fn GradedDim::total(self : GradedDim) -> Int32 {
-  self.m + self.n
-}
-
-///|
 /// dim of the Grassmann fibre Λ(n) = 2^n (Theorem T1).
 pub fn GradedDim::grassmann_dim(self : GradedDim) -> Int32 {
   pow2(self.n)
@@ -56,19 +50,34 @@ pub fn pow2(k : Int32) -> Int32 {
 
 ///|
 pub fn popcount(mask : Int32) -> Int32 {
-  let mut c = 0
-  let mut v = mask
-  while v != 0 {
-    c += v & 1
-    v = v >> 1
-  }
-  c
+  mask.popcnt()
+}
+
+///|
+/// Hardware-intrinsic 64-bit population count (`%u64.popcnt` in MoonBit 0.10.22).
+pub fn popcount64(mask : UInt64) -> Int32 {
+  mask.popcnt()
 }
 
 ///|
 /// Z_2 parity of a Grassmann monomial.
 pub fn parity(mask : Int32) -> Int32 {
   popcount(mask) % 2
+}
+
+///|
+/// Z_2 parity of a 64-bit Grassmann monomial (`n <= 64`).
+pub fn parity64(mask : UInt64) -> Int32 {
+  popcount64(mask) % 2
+}
+
+///|
+/// IEEE-754 total-order sorting (`Double::total_compare`, new in MoonBit 0.10.19+),
+/// deterministic even in the presence of `-0.0` or `NaN`.
+pub fn sort_total(xs : Array[Double]) -> Array[Double] {
+  let out = xs.copy()
+  out.sort_by(Double::total_compare)
+  out
 }
 
 ///|
@@ -422,6 +431,12 @@ test "core: graded dimension, popcount, determinant, inverse" {
   assert_eq(d.grassmann_dim(), 8)
   assert_eq(popcount(0b101101), 4)
   assert_eq(parity(0b101101), 0)
+  assert_eq(popcount64(0x8000_0000_0000_000FUL), 5)
+  assert_eq(parity64(0x8000_0000_0000_000FUL), 1)
+  let ts = sort_total([3.0, -1.0, 0.0 / 0.0, -0.0, 2.0])
+  assert_true(ts[0] != ts[0]) // NaN sorts first under Double::total_compare
+  assert_true(approx(ts[1], -1.0))
+  assert_true(approx(ts[4], 3.0))
   let a = [1.0, 2.0, 3.0, 4.0]
   assert_true(approx(determinant(a, 2), -2.0))
   let inv = inverse([4.0, 0.0, 0.0, 2.0], 2)

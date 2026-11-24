@@ -24,11 +24,13 @@ moon test --target js --deny-warn
 echo "==> build"
 moon build --target wasm
 
-echo "==> run both pipelines and refresh the exported artefacts"
+echo "==> run all four pipelines and refresh the exported artefacts"
 moon run src/cmd/main > run_output.txt
 python3 scripts/extract_traces.py
 python3 scripts/make_report.py
 python3 scripts/make_report_langlands.py
+python3 scripts/make_report_frontier.py
+python3 scripts/make_report_universe.py
 
 echo "==> dead-code scan (definitions with zero references)"
 python3 scripts/dead_code_scan.py

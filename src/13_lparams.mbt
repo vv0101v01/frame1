@@ -26,10 +26,7 @@
 /// `n² × n²` matrix (row index `(i,j)`, column index `(k,l)`).
 pub fn adjoint_operator(nil : Array[Double], n : Int32) -> Array[Double] {
   let nn = n * n
-  let m : Array[Double] = []
-  for _ in 0..<(nn * nn) {
-    m.push(0.0)
-  }
+  let m = Array::make(nn * nn, 0.0)
   // (XN)[i][j] = X[i][k] N[k][j] ; (NX)[i][j] = N[i][k] X[k][j]
   for i in 0..<n {
     for j in 0..<n {
@@ -60,10 +57,7 @@ pub fn nilpotent_standard(blocks : Array[Int32]) -> Array[Double] {
   for b in blocks {
     n += b
   }
-  let m : Array[Double] = []
-  for _ in 0..<(n * n) {
-    m.push(0.0)
-  }
+  let m = Array::make(n * n, 0.0)
   let mut off = 0
   for b in blocks {
     for i in 0..<(b - 1) {

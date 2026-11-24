@@ -37,24 +37,6 @@ pub fn SuperMatrix::new(
 }
 
 ///|
-pub fn SuperMatrix::zero(
-  re : Int32,
-  ro : Int32,
-  ce : Int32,
-  co : Int32,
-  parity : Int32,
-) -> SuperMatrix {
-  SuperMatrix::{
-    re,
-    ro,
-    ce,
-    co,
-    parity,
-    data: Array::make((re + ro) * (ce + co), 0.0),
-  }
-}
-
-///|
 pub fn SuperMatrix::rows(self : SuperMatrix) -> Int32 {
   self.re + self.ro
 }
@@ -67,16 +49,6 @@ pub fn SuperMatrix::cols(self : SuperMatrix) -> Int32 {
 ///|
 pub fn SuperMatrix::get(self : SuperMatrix, i : Int32, j : Int32) -> Double {
   self.data[i * self.cols() + j]
-}
-
-///|
-pub fn SuperMatrix::set(
-  self : SuperMatrix,
-  i : Int32,
-  j : Int32,
-  v : Double,
-) -> Unit {
-  self.data[i * self.cols() + j] = v
 }
 
 ///|

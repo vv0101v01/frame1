@@ -1,8 +1,8 @@
 name: gate
 
 # The whole quality gate in one job: formatting, warnings-as-errors type
-# checking, the 55-test suite on both backends, the executable, the exported
-# CSV traces, both HTML reports, and the dead-code scan.
+# checking, the 82-test suite on both backends, the executable, the exported
+# CSV traces, all four HTML reports, and the (strict) dead-code scan.
 #
 # We also assert that everything the run produces is byte-identical to what is
 # committed: the traces and reports are *derived* artefacts, so a diff here
@@ -59,6 +59,10 @@ jobs:
           path: |
             docs/report.html
             docs/report_langlands.html
+            docs/report_frontier.html
+            docs/report_universe.html
             emergence_trace.csv
             langlands_trace.csv
+            frontier_trace.csv
+            universe_trace.csv
             run_output.txt

@@ -34,10 +34,7 @@ pub fn jm_triple(blocks : Array[Int32]) -> Array[Array[Double]] {
   for b in blocks {
     n += b
   }
-  let h : Array[Double] = []
-  for _ in 0..<(n * n) {
-    h.push(0.0)
-  }
+  let h = Array::make(n * n, 0.0)
   let mut off = 0
   for b in blocks {
     for i in 0..<b {
@@ -46,10 +43,7 @@ pub fn jm_triple(blocks : Array[Int32]) -> Array[Array[Double]] {
     off += b
   }
   // f must satisfy [e,f] = h: f_{i+1,i} = (i+1)(b-1-i) inside a block of size b.
-  let f : Array[Double] = []
-  for _ in 0..<(n * n) {
-    f.push(0.0)
-  }
+  let f = Array::make(n * n, 0.0)
   let mut off2 = 0
   for b in blocks {
     for i in 0..<(b - 1) {
@@ -85,10 +79,7 @@ pub fn gcheck_matrix(blocks : Array[Int32]) -> Array[Double] {
   let triple = jm_triple(blocks)
   let h = triple[1]
   let nn = n * n
-  let m : Array[Double] = []
-  for _ in 0..<(nn * nn) {
-    m.push(0.0)
-  }
+  let m = Array::make(nn * nn, 0.0)
   for i in 0..<n {
     for j in 0..<n {
       let row = i * n + j
@@ -113,16 +104,10 @@ pub fn gcheck_weights(blocks : Array[Int32]) -> Array[Double] {
 }
 
 ///|
-/// Number of weights (i.e. `n`), given the Jordan type.
-fn weights_count(blocks : Array[Int32]) -> Int32 {
-  partition_sum(blocks)
-}
-
-///|
 /// Multiplicity of the weight *value* `v` in `h` (not to be confused with
 /// `gcheck_multiplicity`, which counts the weight spaces of `Θ = ad(h/2)`).
-fn weight_value_multiplicity(blocks : Array[Int32], v : Double) -> Int32 {
-  let w = gcheck_weights(blocks)
+/// Takes the already-computed weight list so callers scan `h` only once.
+fn weight_value_multiplicity(w : Array[Double], v : Double) -> Int32 {
   let mut m = 0
   for i in 0..<w.length() {
     if (w[i] - v).abs() < 1.0e-9 {
@@ -155,8 +140,8 @@ pub fn gcheck_multiplicity(blocks : Array[Int32], k : Int32) -> Int32 {
 pub fn gcheck_kernel_dim(blocks : Array[Int32]) -> Int32 {
   let w = gcheck_weights(blocks)
   let mut total = 0
-  for i in 0..<weights_count(blocks) {
-    total += weight_value_multiplicity(blocks, w[i])
+  for i in 0..<w.length() {
+    total += weight_value_multiplicity(w, w[i])
   }
   total
 }

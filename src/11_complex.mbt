@@ -129,12 +129,6 @@ pub fn cx_pow(a : Cx, b : Cx) -> Cx {
 }
 
 ///|
-///Real power of a complex scalar.
-pub fn cx_pow_real(a : Cx, t : Double) -> Cx {
-  cx_pow(a, cx_of_real(t))
-}
-
-///|
 ///Set membership test with tolerance (used in tests, not as a hash key).
 pub fn cx_approx(a : Cx, b : Cx, tol~ : Double = 1.0e-9) -> Bool {
   approx(a.re, b.re, tol~) && approx(a.im, b.im, tol~)
@@ -145,24 +139,22 @@ pub fn cx_approx(a : Cx, b : Cx, tol~ : Double = 1.0e-9) -> Bool {
 // ---------------------------------------------------------------------------
 
 ///|
-/// `lgamma(x) = log Γ(x)` for `x > 0` via the Lanczos approximation.
-/// Accuracy is ~1e-13 on `[0.5, 40]`, which is all the Eisenstein layer needs.
-pub fn lgamma(x : Double) -> Double {
-  let g : Array[Double] = [
+/// Shared Lanczos `g = 7` coefficients (Godfrey / Spouge 9-term table).
+fn lanczos_g7_coeffs() -> Array[Double] {
+  [
     676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406,
     12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7,
   ]
+}
+
+///|
+/// `lgamma(x) = log Γ(x)` for `x > 0` via the shared complex Lanczos log-series.
+/// Accuracy is ~1e-13 on `[0.5, 40]`.
+pub fn lgamma(x : Double) -> Double {
   if x < 0.5 {
-    // Reflection formula.
     @math.ln(@math.PI / @math.sin(@math.PI * x)) - lgamma(1.0 - x)
   } else {
-    let z = x - 1.0
-    let t = z + 7.5
-    let mut a = 0.99999999999980993
-    for i in 0..<8 {
-      a += g[i] / (z + (i + 1).to_double())
-    }
-    0.5 * @math.ln(2.0 * @math.PI) + (z + 0.5) * @math.ln(t) - t + @math.ln(a)
+    lgamma_cx_right(cx_of_real(x)).re
   }
 }
 
@@ -181,26 +173,47 @@ fn bernoulli_even() -> Array[Double] {
 }
 
 ///|
-/// Riemann zeta by Euler–Maclaurin for `Re(s) > 1/2`, and by the functional
-/// equation `ζ(s) = 2^s π^{s-1} sin(πs/2) Γ(1-s) ζ(1-s)` below that.
+/// Complex sine `sin(z) = (e^{iz} - e^{-iz}) / (2i)`.
+pub fn cx_sin(z : Cx) -> Cx {
+  let iz = { re: -z.im, im: z.re, }
+  let niz = { re: z.im, im: -z.re, }
+  let diff = cx_sub(cx_exp(iz), cx_exp(niz))
+  { re: 0.5 * diff.im, im: -0.5 * diff.re, }
+}
+
+///|
+/// Complex cosine `cos(z) = (e^{iz} + e^{-iz}) / 2`.
+pub fn cx_cos(z : Cx) -> Cx {
+  let iz = { re: -z.im, im: z.re, }
+  let niz = { re: z.im, im: -z.re, }
+  cx_scale(cx_add(cx_exp(iz), cx_exp(niz)), 0.5)
+}
+
+///|
+/// Riemann zeta across the ENTIRE complex plane `s ∈ ℂ \ {1}`:
+/// Euler–Maclaurin for `Re(s) >= 1/2` (including the critical line `s = 1/2 + it`),
+/// and full complex Riemann functional equation
+/// `ζ(s) = 2^s π^{s-1} sin(πs/2) Γ(1-s) ζ(1-s)` for `Re(s) < 1/2` (eliminating the
+/// previous `s.im == 0` restriction).
 pub fn zeta_cx(s : Cx) -> Cx {
-  if s.re < 0.5 && s.im == 0.0 {
-    // Real argument: use the reflection formula; sin(πs/2) is real here.
-    let one_minus = cx_of_real(1.0 - s.re)
-    let z = zeta_cx(one_minus)
-    let pref = @math.pow(2.0, s.re) *
-      @math.pow(@math.PI, s.re - 1.0) *
-      @math.sin(@math.PI * s.re / 2.0) *
-      @math.exp(lgamma(1.0 - s.re))
-    cx_scale(z, pref)
+  if s.re < 0.5 {
+    let one_minus = cx_sub(cx_one(), s)
+    let z = zeta_euler_maclaurin(one_minus)
+    let two_s = cx_pow(cx_of_real(2.0), s)
+    let pi_s1 = cx_pow(cx_of_real(@math.PI), cx_sub(s, cx_one()))
+    let sin_term = cx_sin(cx_scale(s, 0.5 * @math.PI))
+    let gam = gamma_cx(one_minus)
+    cx_mul(cx_mul(cx_mul(two_s, pi_s1), cx_mul(sin_term, gam)), z)
   } else {
     zeta_euler_maclaurin(s)
   }
 }
 
 ///|
-/// Euler–Maclaurin evaluation
+/// Euler–Maclaurin evaluation across the full half-plane `Re(s) >= 1/2`:
 /// `ζ(s) = Σ_{n<N} n^{-s} + N^{1-s}/(s-1) + N^{-s}/2 + Σ_k B_{2k}/(2k)! (s)_{2k-1} N^{-s-2k+1}`.
+/// Uses true complex powers `cx_pow(N, ...)` rather than real-part exponents so
+/// imaginary spectral parameters `s = σ + it` are exact.
 pub fn zeta_euler_maclaurin(s : Cx) -> Cx {
   let n_terms = 40
   let b = bernoulli_even()
@@ -209,19 +222,19 @@ pub fn zeta_euler_maclaurin(s : Cx) -> Cx {
     let l = cx_log(cx_of_real(n.to_double()))
     total = cx_add(total, cx_exp(cx_neg(cx_mul(l, s))))
   }
-  let nf = n_terms.to_double()
+  let nc = cx_of_real(n_terms.to_double())
   let s_minus_1 = cx_sub(s, cx_one())
-  let tail1 = cx_div(cx_pow_real(cx_of_real(nf), 1.0 - s.re), s_minus_1)
-  let tail2 = cx_scale(cx_pow_real(cx_of_real(nf), -s.re), 0.5)
+  let tail1 = cx_div(cx_pow(nc, cx_sub(cx_one(), s)), s_minus_1)
+  let tail2 = cx_scale(cx_pow(nc, cx_neg(s)), 0.5)
   total = cx_add(total, cx_add(tail1, tail2))
-  let mut poch = cx_one() // (s)_{2k-1} = s(s+1)...(s+2k-2)
   for k in 1..<=7 {
-    poch = cx_one()
+    let mut poch = cx_one()
     for j in 0..<(2 * k - 1) {
       poch = cx_mul(poch, cx_add(s, cx_of_real(j.to_double())))
     }
     let coef = b[k - 1] / factorial(2 * k).to_double()
-    let n_pow = cx_pow_real(cx_of_real(nf), -s.re - (2 * k - 1).to_double())
+    let exp_s = cx_neg(cx_add(s, cx_of_real((2 * k - 1).to_double())))
+    let n_pow = cx_pow(nc, exp_s)
     total = cx_add(total, cx_scale(cx_mul(poch, n_pow), coef))
   }
   total
@@ -238,28 +251,48 @@ pub fn factorial(n : Int32) -> Int32 {
 }
 
 ///|
-/// Completed Riemann zeta `ξ(s) = π^{-s/2} Γ(s/2) ζ(s)`; the functional
-/// equation is `ξ(s) = ξ(1-s)` (Theorem T16).
+/// Completed Riemann zeta `ξ(s) = π^{-s/2} Γ(s/2) ζ(s)` across the full complex plane.
+/// For `Re(s) < 1/2`, uses the functional equation `ξ(s) = ξ(1-s)` directly so poles of
+/// `Γ(s/2)` at non-positive even integers cancel against the trivial zeros of `ζ(s)`.
 pub fn xi_cx(s : Cx) -> Cx {
-  if s.re <= 0.0 && s.im == 0.0 {
-    return xi_cx(cx_of_real(1.0 - s.re))
+  if s.re < 0.5 {
+    return xi_cx_right(cx_sub(cx_one(), s))
   }
-  // log π^{-s/2} = -(s/2)·log π, and Γ(s/2) is evaluated in C.
-  let log_pi = cx_log(cx_of_real(@math.PI))
-  let log_pref = cx_add(
-    cx_neg(cx_scale(cx_mul(log_pi, s), 0.5)),
-    cx_log(gamma_cx(cx_scale(s, 0.5))),
-  )
-  cx_mul(cx_exp(log_pref), zeta_cx(s))
+  xi_cx_right(s)
 }
 
 ///|
-/// `Γ(z)` for `Re(z) > 0` by the Lanczos approximation in the complex plane.
+fn xi_cx_right(s : Cx) -> Cx {
+  let half_pi_pow = cx_pow(cx_of_real(@math.PI), cx_scale(cx_neg(s), 0.5))
+  cx_mul(cx_mul(half_pi_pow, gamma_cx(cx_scale(s, 0.5))), zeta_cx(s))
+}
+
+///|
+/// `Γ(z)` across the full complex plane `ℂ \ {0, -1, -2, ...}` via Lanczos + Euler reflection
+/// `Γ(z) = π / (sin(πz) Γ(1-z))` for `Re(z) < 0.5`.
 pub fn gamma_cx(z : Cx) -> Cx {
-  let g : Array[Double] = [
-    676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406,
-    12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7,
-  ]
+  if z.re < 0.5 {
+    let sin_pz = cx_sin(cx_scale(z, @math.PI))
+    return cx_div(
+      cx_of_real(@math.PI),
+      cx_mul(sin_pz, gamma_cx_lanczos(cx_sub(cx_one(), z))),
+    )
+  }
+  gamma_cx_lanczos(z)
+}
+
+///|
+/// `log Γ(z)` on the Lanczos half-plane `Re(z) ≥ 0.5`; the single source of
+/// truth for both the real `lgamma` and every complex Γ-evaluation.
+fn lgamma_cx_right(z : Cx) -> Cx {
+  cx_log(gamma_cx_lanczos(z))
+}
+
+///|
+/// Lanczos `g = 7` series on the half-plane `Re(z) ≥ 0.5`.  This is the only
+/// place the 9-term coefficient table is stored (cf. `lanczos_g7_coeffs`).
+fn gamma_cx_lanczos(z : Cx) -> Cx {
+  let g = lanczos_g7_coeffs()
   let zz = cx_sub(z, cx_one())
   let t = cx_add(zz, cx_of_real(7.5))
   let mut a = cx_of_real(0.99999999999980993)
@@ -313,13 +346,43 @@ test "T16b: ζ(2) = π²/6 and ζ(-1) = -1/12" {
 }
 
 ///|
-test "T16c: ξ(s) = ξ(1-s) on and off the critical line" {
+test "T16c: ξ(s) = ξ(1-s) on and off the critical line (including full complex plane)" {
   for k in 1..<=5 {
     let s = 0.4 + 0.37 * k.to_double()
     assert_true(
       cx_approx(xi_cx(cx_of_real(s)), xi_cx(cx_of_real(1.0 - s)), tol=1.0e-8),
     )
+    assert_true(
+      approx(
+        @math.exp(lgamma(s + 1.0)),
+        gamma_cx(cx_of_real(s + 1.0)).re,
+        tol=1.0e-11,
+      ),
+    )
   }
+  // Full complex functional equation: Re(s) < 0.5 and Im(s) != 0
+  let s_cx = { re: -0.35, im: 2.75, }
+  let z_lhs = zeta_cx(s_cx)
+  let one_minus = cx_sub(cx_one(), s_cx)
+  let rhs_pref = cx_mul(
+    cx_mul(
+      cx_pow(cx_of_real(2.0), s_cx),
+      cx_pow(cx_of_real(@math.PI), cx_sub(s_cx, cx_one())),
+    ),
+    cx_mul(cx_sin(cx_scale(s_cx, 0.5 * @math.PI)), gamma_cx(one_minus)),
+  )
+  assert_true(
+    cx_approx(z_lhs, cx_mul(rhs_pref, zeta_cx(one_minus)), tol=1.0e-10),
+  )
+  // sin^2(z) + cos^2(z) = 1 in C
+  let sc = cx_add(
+    cx_mul(cx_sin(s_cx), cx_sin(s_cx)),
+    cx_mul(cx_cos(s_cx), cx_cos(s_cx)),
+  )
+  assert_true(cx_approx(sc, cx_one(), tol=1.0e-12))
+  // First nontrivial Riemann zero on the critical line: s = 1/2 + 14.134725141734695 i
+  let zero1 = { re: 0.5, im: 14.134725141734695, }
+  assert_true(cx_abs(zeta_cx(zero1)) < 1.0e-7)
   // Γ(1/2)=√π and ξ(1/2) real
   let half = cx_of_real(0.5)
   assert_true(approx(gamma_cx(half).re, @math.PI.sqrt(), tol=1.0e-10))
