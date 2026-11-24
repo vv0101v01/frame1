@@ -81,6 +81,9 @@ CI 最後一步係 `git diff --exit-code`：因為 `run_output.txt`、CSV、報�
 第五輪（commit `66d4116`，87 個測試、五條管線、`hexad_trace.csv`）：**全綠，23 秒，artifact 141 KB**
 — <https://github.com/vv0101v01/frame1/actions/runs/45451706494>
 
+第六輪（commit `e0e04a5`，113 個測試、六條管線、`correspondence_trace.csv` + `jacobi_spectrum.csv`）：**全綠，42 秒，artifact 146 KB**
+— <https://github.com/vv0101v01/frame1/actions/runs/45482403702>
+
 ## 3. 專案結構
 
 ```
