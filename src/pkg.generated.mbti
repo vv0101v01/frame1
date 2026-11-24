@@ -11,6 +11,12 @@ pub fn adelic_c_euler_product(Cx, Int32) -> Cx
 
 pub fn adjoint_operator(Array[Double], Int32) -> Array[Double]
 
+pub fn adjunction_csv_header() -> String
+
+pub fn adjunction_defect(Cnx, MapDatum) -> Int32
+
+pub fn adjunction_step_defects(Int32) -> (Int32, Int32, Int32, Double, Double, Double)
+
 pub fn affine_map(Array[Double], Array[Double], Array[Double], Int32) -> Array[Double]
 
 pub fn algebraic_connectivity(Int32) -> Double
@@ -18,6 +24,8 @@ pub fn algebraic_connectivity(Int32) -> Double
 pub fn approx(Double, Double, tol? : Double) -> Bool
 
 pub fn archimedean_c_factor(Cx) -> Cx
+
+pub fn beck_chevalley_defect(Cnx, SpanDatum) -> Int32
 
 pub fn belief_dispersion(Array[Array[Double]]) -> Double
 
@@ -36,6 +44,8 @@ pub fn beth_tower_strict(Int32) -> Bool
 pub fn betti_dim(Int32, Int32, Int32) -> Int32
 
 pub fn betti_dim_gl(Int32, Int32) -> Int32
+
+pub fn binom(Int32, Int32) -> Int32
 
 pub fn c_cocycle_defect(Array[Int32], Array[Int32], Array[Double]) -> Double
 
@@ -63,17 +73,37 @@ pub fn cartan_matrix(RootType) -> Array[Double]
 
 pub fn casimir_defect(Array[Double]) -> Double
 
+pub fn catalan(Int32) -> Int32
+
 pub fn category_universe_level(CategorySize) -> Int32
 
 pub fn centered_energy(Array[Double]) -> Double
 
+pub fn central_binom_vandermonde(Int32) -> Bool
+
 pub fn centralizer_dim_formula(Array[Int32]) -> Int32
+
+pub fn char_alt2(Array[Double]) -> Double
 
 pub fn char_poly_at(Array[Double], Int32, Double) -> Double
 
 pub fn char_poly_monic(Array[Double], Int32, Double) -> Double
 
+pub fn char_std(Array[Double]) -> Double
+
+pub fn char_sym2(Array[Double]) -> Double
+
 pub fn clamp(Double, Double, Double) -> Double
+
+pub fn clausen2(Double) -> Double
+
+pub fn clausen_ladder_defect() -> Double
+
+pub fn clausen_node_defect() -> Double
+
+pub fn clifford_pairing_c3() -> Double
+
+pub fn closed_geodesic_count(Int32, Int32) -> Int32
 
 pub fn closure_certificate(Double, Double) -> Double
 
@@ -86,6 +116,8 @@ pub fn coh_dual(CohComplex) -> CohComplex
 pub fn coh_dualizing(Int32) -> CohComplex
 
 pub fn coh_etale_cover_euler(Int32, Int32) -> Int32
+
+pub fn coh_euler_alt(Array[Int32]) -> Int32
 
 pub fn coh_euler_characteristic(CohComplex) -> Int32
 
@@ -119,6 +151,8 @@ pub fn constant_term_sl2(Double, Double) -> Double
 
 pub fn coroot(Array[Double]) -> Array[Double]
 
+pub fn correspondence_csv_header() -> String
+
 pub fn cosine_matrix(Array[Array[Double]]) -> Array[Double]
 
 pub fn coxeter_length(RootType, Array[Double]) -> Int32
@@ -128,6 +162,8 @@ pub fn ct_eis_defect(Array[Int32], Array[Double]) -> Double
 pub fn ct_fiber_dim(Array[Int32]) -> Int32
 
 pub fn curvature_norm(Array[Double], Int32) -> Double
+
+pub fn curve11_point_count(Int32) -> Int32
 
 pub fn cx_abs(Cx) -> Double
 
@@ -176,6 +212,12 @@ pub fn cx_sin(Cx) -> Cx
 pub fn cx_sub(Cx, Cx) -> Cx
 
 pub fn cx_zero() -> Cx
+
+pub fn de_rham_d(DState) -> DState
+
+pub fn de_rham_kernel_certified(Int32, Int32) -> Bool
+
+pub fn de_rham_kernel_formula(Int32, Int32) -> Int32
 
 pub fn decide_conservatively(Formula, Int32, Int32, Array[Int32], max_size? : Int32) -> Bool
 
@@ -233,7 +275,13 @@ pub fn energy(Array[Double]) -> Double
 
 pub fn entropy(Array[Double]) -> Double
 
+pub fn eta11_hecke_coefficients() -> Array[Int32]
+
+pub fn eta11_level() -> Int32
+
 pub fn eval_formula(Formula, Int32, Array[Int32]) -> Bool
+
+pub fn exchange_duality_defect(Double, Double) -> Double
 
 pub fn excursion_values(Array[Double], Int32) -> Array[Double]
 
@@ -257,15 +305,29 @@ pub fn fricke_defect(Mat2, Mat2) -> Double
 
 pub fn fricke_defect_cx(Mat2Cx, Mat2Cx) -> Double
 
+pub fn fricke_eigenform_certified() -> Bool
+
+pub fn fricke_eigenvalue_sign() -> Int32
+
 pub fn fricke_kappa(Double, Double, Double) -> Double
 
 pub fn fricke_kappa_cx(Cx, Cx, Cx) -> Cx
 
 pub fn frob_bijective_mod_p(Int32) -> Bool
 
+pub fn frob_p(DState) -> DState
+
 pub fn frontier_csv_header() -> String
 
 pub fn full_mask64(Int32) -> UInt64
+
+pub fn galois_act2(Int32, Int32, Int32, Int32) -> (Int32, Int32)
+
+pub fn galois_group_algebra_dim(Int32) -> Int32
+
+pub fn galois_reciprocity_defect(Int32) -> Int32
+
+pub fn galois_s_ell(Int32, Int32) -> Int32
 
 pub fn gamma_cx(Cx) -> Cx
 
@@ -301,6 +363,10 @@ pub fn gcheck_weights(Array[Int32]) -> Array[Double]
 
 pub fn generate_weyl_group(RootType) -> Array[Array[Double]]
 
+pub fn geodesic_reflection_fixed(Int32, Int32) -> Int32
+
+pub fn gl3_pairwise_law_defect(Array[Double]) -> Double
+
 pub fn global_c_factor_cx(Cx) -> Cx
 
 pub fn goldman_tensor(Double, Double, Double) -> Array[Double]
@@ -319,11 +385,33 @@ pub fn grothendieck_cardinal(Int32) -> Cardinal
 
 pub fn grothendieck_universe(Int32) -> GrothendieckUniverse
 
+pub fn hadamard_slice(Double, Array[Double]) -> Double
+
+pub fn hadamard_slice_growing_bounded(Double) -> Bool
+
+pub fn hankel_positive_definite(JacobiDatum, Int32) -> Bool
+
+pub fn hasse_div(DState) -> DState
+
+pub fn hasse_inverse_defect(Int32, Int32) -> Int32
+
+pub fn hasse_kernel_dim(Int32, Int32) -> Int32
+
+pub fn hasse_shift_minus_one_matrix(Int32, Int32) -> Array[Int32]
+
 pub fn heat_cfl(Double, Int32) -> Double
 
 pub fn heat_flow(Array[Double], Array[Double], Double, Int32, Int32, safety? : Double) -> HeatTrace
 
 pub fn heat_step(Array[Double], Array[Double], Double, Double, Int32) -> Array[Double]
+
+pub fn hecke_a(Int32) -> Int32
+
+pub fn hecke_hasse_defect() -> Double
+
+pub fn hecke_multiplicativity_defect() -> Int32
+
+pub fn hecke_polynomial_gl2(Int32) -> (Double, Double, Double)
 
 pub let hexad_agent_model : Array[Int32]
 
@@ -351,6 +439,10 @@ pub fn hf_subset(Int32, Int32) -> Bool
 
 pub fn hf_transitive(Int32) -> Bool
 
+pub fn ind_interchange_defect(IndSheaf, Int32) -> Int32
+
+pub fn ind_tensor_euler_is_multiplicative(Cnx, Cnx) -> Bool
+
 pub fn int_pow(Int32, Int32) -> Int32
 
 pub fn inverse(Array[Double], Int32) -> Array[Double]
@@ -366,6 +458,14 @@ pub fn is_sigma_n(Formula, Int32) -> Bool
 pub fn is_small_in(CategorySize, Int32) -> Bool
 
 pub fn jacobi_defect((Array[Double]) -> Double, (Array[Double]) -> Double, (Array[Double]) -> Double, Array[Double]) -> Double
+
+pub fn jacobi_moments(JacobiDatum, Int32) -> Array[Double]
+
+pub fn jacobi_poly(JacobiDatum, Int32, Double) -> Double
+
+pub fn jacobi_roots_match_eigenvalues(JacobiDatum, tol? : Double) -> Bool
+
+pub fn jacquet_langlands_defect() -> Double
 
 pub fn jm_centralizer_dim(Array[Int32]) -> Int32
 
@@ -384,6 +484,18 @@ pub fn kostant_transversality_rank(Int32) -> Int32
 pub fn koszul_sign(Int32, Int32) -> Double
 
 pub fn koszul_sign64(UInt64, UInt64) -> Double
+
+pub fn kottwitz_eps(Array[Int32]) -> Int32
+
+pub fn kottwitz_geom_pair(Int32, Int32) -> (Int32, Int32)
+
+pub fn kottwitz_leg_parity(Int32) -> Int32
+
+pub fn kottwitz_sign_grid_defect() -> Int32
+
+pub fn kottwitz_spec_pair(Int32, Int32) -> (Int32, Int32)
+
+pub fn kottwitz_two_core_size(Int32) -> Int32
 
 pub fn kuramoto_derivative(Array[Double], Array[Double], Array[Double], Double) -> Array[Double]
 
@@ -417,6 +529,10 @@ pub fn legendre_gram(Int32, Int32, Quad) -> Double
 
 pub fn legendre_jacobi(Int32) -> Array[Double]
 
+pub fn legendre_sym(Int32, Int32) -> Int32
+
+pub fn level_p_eigenform_dimension(Int32) -> Int32
+
 pub fn levi_dim(Array[Int32]) -> Int32
 
 pub fn levi_orbit_dim(Array[Int32]) -> Int32
@@ -425,7 +541,11 @@ pub fn lgamma(Double) -> Double
 
 pub fn lisse_rep_correspondence(Int32, Int32) -> Bool
 
+pub fn local_langlands_pointcount_defect() -> Int32
+
 pub fn lusztig_q_multiplicity_a2(Array[Int32], Array[Int32], Double) -> Double
+
+pub fn map_compose(MapDatum, MapDatum) -> MapDatum
 
 pub fn mass(Array[Double]) -> Double
 
@@ -473,7 +593,11 @@ pub fn mean_of(Array[Double]) -> Double
 
 pub fn mean_phase(Array[Double]) -> Double
 
+pub fn metric_duality_defect(Double, Double) -> Double
+
 pub fn mobius_add(Array[Double], Array[Double]) -> Array[Double]
+
+pub fn montgomery_gap_ratios() -> (Double, Double)
 
 pub fn nah_torus_betti_traces(Cx, Cx) -> Array[Cx]
 
@@ -531,6 +655,8 @@ pub fn partitions(Int32) -> Array[Array[Int32]]
 
 pub fn phi_functional_defect(Double) -> Double
 
+pub fn pmod_pow(Int32, Int32, Int32) -> Int32
+
 pub fn poincare_ball_conformal(Array[Double]) -> Double
 
 pub fn poincare_ball_distance(Array[Double], Array[Double]) -> Double
@@ -554,6 +680,8 @@ pub fn poisson_rank(Array[Double]) -> Int32
 pub fn poly_deriv_eval(Array[Double], Double) -> Double
 
 pub fn poly_eval(Array[Double], Double) -> Double
+
+pub fn polynomial_carrier_fails_hasse(Int32) -> (Bool, Bool)
 
 pub fn popcount(Int32) -> Int32
 
@@ -581,9 +709,19 @@ pub fn pth_power_image_count(Int32, Int32) -> Int32
 
 pub fn pth_power_mod(Int32, Int32, Int32) -> Int32
 
+pub fn pullback_cnx(Cnx, MapDatum) -> Cnx
+
 pub fn pullback_metric(Array[Double], Array[Double], Int32) -> Array[Double]
 
+pub fn pushforward_cnx(Cnx, MapDatum) -> Cnx
+
+pub fn r0_interchange_failure(Int32) -> (Int32, Int32)
+
 pub fn random_sl2(Rng) -> Mat2
+
+pub fn rank_fp(Array[Int32], Int32, Int32) -> Int32
+
+pub fn recoupling_defect(Array[Double]) -> Double
 
 pub fn reflected_dual(Array[Double]) -> Array[Double]
 
@@ -617,6 +755,8 @@ pub fn rewrite_fix(Term, Int32) -> Term
 
 pub fn rewrite_once(Term) -> Term
 
+pub fn riemann_von_mangoldt(Double) -> Double
+
 pub fn ring_lambda_max(Int32) -> Double
 
 pub fn ring_laplacian(Int32) -> Array[Double]
@@ -628,6 +768,10 @@ pub fn root_projection_defect(RootType, Array[Cx], (Cx) -> Cx) -> Double
 pub fn rope_2d_score(Array[Double], Array[Double], Int32, Double) -> Double
 
 pub fn rotation(Double) -> Array[Double]
+
+pub fn run_adjunction_emergence(steps? : Int32) -> AdjunctionTrace
+
+pub fn run_correspondence_emergence(steps? : Int32) -> CorrespondenceTrace
 
 pub fn run_emergence(EmergenceConfig) -> EmergenceTrace
 
@@ -641,7 +785,15 @@ pub fn run_langlands(LanglandsConfig) -> LanglandsTrace
 
 pub fn run_universe_emergence(steps? : Int32, levels? : Int32, seed? : Int32) -> UniverseTrace
 
+pub fn s_dual_apply(SDualPair) -> SDualPair
+
+pub fn s_dual_defect(SDualPair) -> Double
+
 pub fn satake_from_hecke(Double, Double) -> Array[Double]
+
+pub fn satake_gl2(Double, Double) -> (Cx, Cx)
+
+pub fn satake_gl2_defect() -> Double
 
 pub fn satake_ic_match(RootType, Array[Double]) -> Bool
 
@@ -650,6 +802,12 @@ pub fn satake_minuscule_poincare(RootType, Array[Double], Double) -> Double
 pub fn satake_perverse_degree(RootType, Array[Double]) -> Int32
 
 pub fn satake_poincare_palindromic(RootType, Array[Double], Int32) -> Bool
+
+pub fn serre_class_count(Int32, Int32) -> Int32
+
+pub fn serre_principal_units_count(Int32, Int32) -> Int32
+
+pub fn serre_step(Int32, Int32, Int32, Int32) -> Int32
 
 pub fn sigma_level(Formula) -> (Int32, Int32)
 
@@ -665,11 +823,15 @@ pub fn sort_total(Array[Double]) -> Array[Double]
 
 pub fn spread(Array[Double]) -> Double
 
+pub fn sqroot_count(Int32, Int32) -> Int32
+
 pub fn super_jacobian_ber(Array[Double], Int32, Array[Double], Int32) -> Double
 
 pub fn super_jacobiator(GradedElement, GradedElement, GradedElement) -> GradedElement
 
 pub fn super_jacobiator_m(SuperMatrix, SuperMatrix, SuperMatrix) -> SuperMatrix
+
+pub fn suspend_cnx(Cnx, Int32) -> Cnx
 
 pub fn sylvester_sigma(SuperMatrix, Int32) -> Double
 
@@ -707,6 +869,12 @@ pub fn transformed_connection(Array[Double], Array[Double], Int32) -> Array[Doub
 
 pub fn transpose(Array[Double], Int32, Int32) -> Array[Double]
 
+pub fn tree_ball_size(Int32, Int32) -> Int32
+
+pub fn tree_sphere(Int32, Int32) -> Array[Array[Int32]]
+
+pub fn tree_sphere_size(Int32, Int32) -> Int32
+
 pub fn triad_is_tight() -> Bool
 
 pub fn unification_operator(Hybrid, Hybrid, Double, gamma? : Double) -> Hybrid
@@ -741,6 +909,10 @@ pub fn vec_pow_i(Array[Double], Int32) -> Array[Double]
 
 pub fn vec_scale(Array[Double], Double) -> Array[Double]
 
+pub fn verdier_dual_cnx(Cnx) -> Cnx
+
+pub fn verdier_pullback_commutation_defect(Cnx, MapDatum) -> Int32
+
 pub fn walk(Array[Subst], Term, Int32) -> Term
 
 pub fn weil_weight_defect(Array[Cx], Double, Double) -> Double
@@ -761,15 +933,43 @@ pub fn weyl_mul(Array[Int32], Array[Int32]) -> Array[Int32]
 
 pub fn weyl_rho(RootType) -> Array[Double]
 
+pub fn wilson_thooft_commutation_defect(Double, Double) -> Double
+
+pub fn xi_critical_line_reality_defect(Double) -> Double
+
 pub fn xi_cx(Cx) -> Cx
+
+pub fn xi_reflection_defect(Cx) -> Double
+
+pub fn xi_schwarz_defect(Cx) -> Double
+
+pub fn zero_count_at_first() -> Double
 
 pub fn zeta_cx(Cx) -> Cx
 
 pub fn zeta_euler_maclaurin(Cx) -> Cx
 
+pub fn zeta_factorization_defect(Cx) -> Double
+
+pub fn zeta_zero_heights() -> Array[Double]
+
 // Errors
 
 // Types and methods
+pub(all) struct AdjunctionTrace {
+  rows : Array[String]
+  summary : String
+  max_defect : Int32
+  hasse_ok : Bool
+  ind_ok : Bool
+  kottwitz_ok : Bool
+  satake_ok : Bool
+  jacobi_ok : Bool
+  sdual_ok : Bool
+  steps : Int32
+}
+pub fn AdjunctionTrace::csv(Self) -> String
+
 pub(all) enum Cardinal {
   Finite(Int32)
   Omega
@@ -791,11 +991,30 @@ pub(all) struct ClosureCertificate {
   replacement : Bool
 }
 
+pub(all) struct Cnx {
+  name : String
+  lo : Int32
+  hi : Int32
+  betti : Array[Int32]
+}
+pub fn Cnx::zero() -> Self
+
 pub(all) struct CohComplex {
   lo : Int32
   betti : Array[Int32]
   twist : Int32
 }
+
+pub(all) struct CorrespondenceTrace {
+  rows : Array[String]
+  summary : String
+  max_hasse : Int32
+  max_satake : Double
+  max_xi : Double
+  all_ok : Bool
+  steps : Int32
+}
+pub fn CorrespondenceTrace::csv(Self) -> String
 
 pub(all) struct CouplingGraph {
   n : Int32
@@ -818,6 +1037,13 @@ pub(all) struct Cx {
   re : Double
   im : Double
 }
+
+pub(all) struct DState {
+  p : Int32
+  depth : Int32
+  coef : Array[Double]
+}
+pub fn DState::make(Int32, Array[Double]) -> Self
 
 pub(all) struct EisensteinDatum {
   rank : Int32
@@ -940,6 +1166,19 @@ pub fn Hybrid::canonical(Self) -> Self
 pub fn Hybrid::is_sorted(Self) -> Bool
 pub fn Hybrid::new(Term, Array[Double]) -> Self
 
+pub(all) struct IndSheaf {
+  term : Cnx
+  limits : Array[TowerStep]
+}
+pub fn IndSheaf::colim(Self) -> Cnx
+pub fn IndSheaf::lim(Self) -> Cnx
+
+pub(all) struct JacobiDatum {
+  a : Array[Double]
+  b : Array[Double]
+}
+pub fn JacobiDatum::matrix(Self) -> Array[Double]
+
 pub(all) struct LParameter {
   n : Int32
   eigenvalues : Array[Double]
@@ -990,6 +1229,21 @@ pub(all) struct LegendrePoPE {
 }
 pub fn LegendrePoPE::eval(Self, Int32) -> Double
 pub impl PosKernel for LegendrePoPE
+
+pub(all) struct MapDatum {
+  name : String
+  kind : MapKind
+  d : Int32
+  w : Int32
+}
+
+#derive(Eq, @debug.Debug)
+pub(all) enum MapKind {
+  Smooth
+  Proper
+  Open
+  Closed
+}
 
 pub(all) struct Mat2 {
   a : Double
@@ -1068,6 +1322,21 @@ pub fn RootType::langlands_dual(Self) -> Self
 pub fn RootType::not_equal(Self, Self) -> Bool
 pub fn RootType::rank(Self) -> Int32
 pub fn RootType::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SDualPair {
+  name : String
+  dual : String
+  kappa : Double
+  q : Double
+  lam : Double
+}
+
+pub(all) struct SpanDatum {
+  left : MapDatum
+  right : MapDatum
+  left2 : MapDatum
+  right2 : MapDatum
+}
 
 pub(all) struct SparseSuper {
   n : Int32
@@ -1197,6 +1466,13 @@ pub(all) enum Term {
   Mul(Term, Term)
   Neg(Term)
   Pow(Term, Int32)
+}
+
+pub(all) enum TowerStep {
+  Id
+  Susp(Int32)
+  Twist
+  Cone
 }
 
 pub(all) struct TrainableEncoder {

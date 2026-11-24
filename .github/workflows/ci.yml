@@ -58,6 +58,9 @@ jobs:
           name: reports-and-traces
           if-no-files-found: error
           path: |
+            docs/report_correspondence.html
+            correspondence_trace.csv
+            jacobi_spectrum.csv
             docs/report.html
             docs/report_langlands.html
             docs/report_frontier.html

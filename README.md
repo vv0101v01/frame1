@@ -1,17 +1,22 @@
 # 類智能體湧現的超幾何抽象 · MoonBit 0.10
 
 [![gate](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml/badge.svg)](https://github.com/vv0101v01/frame1/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-87%2F87%20wasm%20%2B%2087%2F87%20js-brightgreen)](#2-品質閘門全部通過一條指令)
+[![tests](https://img.shields.io/badge/tests-113%2F113%20wasm%20%2B%20113%2F113%20js-brightgreen)](#2-品質閘門全部通過一條指令)
 [![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-frame1--hexad-yellow)](https://huggingface.co/spaces/Transynergy/frame1-hexad)
 [![MoonBit](https://img.shields.io/badge/MoonBit-0.10.22-1f6feb)](https://www.moonbitlang.com/download)
 
-以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）、[`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）與 [`docs/FRONTIER.md`](docs/FRONTIER.md)（第三輪前沿擴充與限制消除，T25–T34 / A21–A28）。
+以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）、[`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）（第三輪前沿擴充與限制消除，T25–T34 / A21–A28）、
+[`docs/UNIVERSE.md`](docs/UNIVERSE.md)（第四輪，T35–T46 / A29–A37）、`docs/HEXAD_6IN1_PLAN.md`（第五輪，T47–T48）
+與 [`docs/CORRESPONDENCE.md`](docs/CORRESPONDENCE.md)（第六輪對應湧現，T49–T68 / A40–A52）。
 
 **第一輪（超幾何）**
 > 龐加萊–黎曼超流形 $\mathcal{M}^{m|n}$ · 仿射張量空間 · PoPE 位置編碼 · 非交換幾何與超矩陣方程 · 偏微分演化流 · 超雅可比恆等式 · 二階超質量張量軌道空間 · 符號–神經合一算子 · 自然梯度與費雪資訊度量
 
 **第二輪（Langlands 幾何）**
 > 愛森斯坦級數與常數項函子 · 非半單 L-參數 · Ĝ-算子 · 貝蒂模空間與特徵簇
+
+**第六輪（對應湧現）**
+> 模疊上的完備化 D-模（Hasse 對 `W∘F = id`）⊣ ind-凝聚層（極限/餘極限交換）⊣ 阿貝爾伽羅瓦上同調與科特維茨 ε-雙重性 ⊣ 一般線性群數值局部朗蘭茲（點計數 = Hecke 特徵值、佐武參數）⊣ 無分歧表示與 Fricke 特徵值 ⊣ 哈密頓群空間/對偶（Jacobi ⇄ 正交多項式）與 S-對偶電–磁字典 ⊣ 高階範疇中的拉回/前推/伴隨（T49–T68 / A40–A52）
 
 **第三輪（限制消除與前沿統一綜合）**
 > 64 生成元稀疏超代數 $\Lambda(64)$ 與超 Hodge 對偶 · 任意維度龐加萊球 $\mathbb{B}^m$ 陀螺群與非區塊對角 Berezinian · 全複平面 $\zeta/\xi$ 與臨界線零點 · 古典根系 $A_n/B_n/C_n/D_n$ 與 $p$-進/Adelic Euler 乘積 · Beilinson–Drinfeld $\check{G}$-Opers 與 Kostant 截面 · Twistor 非阿貝爾 Hodge 與 Deligne–Simpson 剛性 · 反向模式自動微分（Reverse-AD）符號–神經編碼器 · 幾何 Satake IC 多項式與 Lusztig $q$-重數
@@ -52,16 +57,16 @@ moon version --all
 
 它依序執行：`moon fmt` + `moon fmt --check` → `moon check --deny-warn` →
 `moon test --target wasm --deny-warn` → `moon test --target js --deny-warn`
-→ `moon build --target wasm` → 跑五條管線（第五條：Hexad ring vs LFM k-NN） → 由 `scripts/extract_traces.py` 匯出五份 CSV
-→ 生成四份 HTML 報告 → `scripts/dead_code_scan.py` 死碼掃描。
+→ `moon build --target wasm` → 跑六條管線（第五條：Hexad ring vs LFM k-NN；第六條：Round-6 對應湧現） → 由 `scripts/extract_traces.py` 匯出六份 CSV
+→ 生成五份 HTML 報告 → `scripts/dead_code_scan.py` 死碼掃描。
 
 | 檢查 | 結果 |
 | --- | --- |
 | `moon fmt --check` | no work to do |
 | `moon check --deny-warn` | 通過（0 warning） |
-| `moon test --target wasm --deny-warn` | `Total tests: 87, passed: 87, failed: 0` |
-| `moon test --target js --deny-warn` | `Total tests: 87, passed: 87, failed: 0` |
-| 死碼掃描 | 584 個定義（29 個檔案）、**0 個零引用定義** |
+| `moon test --target wasm --deny-warn` | `Total tests: 113, passed: 113, failed: 0` |
+| `moon test --target js --deny-warn` | `Total tests: 113, passed: 113, failed: 0` |
+| 死碼掃描 | 695 個定義（35 個檔案）、**0 個零引用定義** |
 
 同一條閘門在 CI 上跑：[`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 （`ubuntu-latest`，用官方安裝器裝 MoonBit 並驗 SHA-256，跑 `scripts/verify.sh`，
@@ -111,12 +116,19 @@ moonbit-superagent/
 │   ├── 25_knn_graph.mbt                     # 第五輪：CouplingGraph（ring_pope / LFM k-NN）、A38 Jacobi 全譜、A39 建圖、T47
 │   ├── 26_lfm_agent_embeddings.mbt          # 第五輪：128 × 1024 int8 LFM2.5 向量（生成檔，勿手改）
 │   ├── 27_hexad_emergence.mbt               # 第五輪：128 agents × 640 steps ring vs k-NN 對照（T48）
+│   ├── 28_rigid_dmodules.mbt                # 第六輪：Hasse 對、ind-凝聚層、Serre 類、Kottwitz 符號（T49-T57a / A40-A44）
+│   ├── 29_satake_correspondence.mbt         # 第六輪：η-積 Hecke 資料、Satake/JL/Hecke（T57-T60 / A45-A46）
+│   ├── 30_hamiltonian_symmetric.mbt         # 第六輪：Jacobi ⇄ 正交多項式、樹、S-對偶字典（T61-T63 / A47-A49）
+│   ├── 31_infinity_adjunctions.mbt          # 第六輪：拉回/前推/伴隨/Beck–Chevalley + 六通道管線（T64 / A50）
+│   ├── 32_spectral_zeta_clausen.mbt         # 第六輪：Hadamard 馴化、Montgomery、Clausen 節點（T65-T68 / A51-A52）
+│   ├── 33_correspondence_emergence.mbt      # 第六輪：耦合總管線 run_correspondence_emergence
 │   └── cmd/main/                            # 可執行範例（五條管線，尾聲輸出 hexad CSV）
 ├── docs/
 │   ├── THEORY.md                 # 第一輪：定理 T1–T15、演算法 A1–A12
 │   ├── LANGLANDS.md              # 第二輪：定理 T16–T24、演算法 A13–A20
 │   ├── FRONTIER.md               # 第三輪：限制消除、定理 T25–T34、演算法 A21–A28
 │   ├── UNIVERSE.md               # 第四輪：定理 T35–T46、演算法 A29–A37
+│   ├── CORRESPONDENCE.md         # 第六輪：定理 T49–T68、演算法 A40–A52
 │   ├── HEXAD_6IN1_PLAN.md        # 第五輪：五模型「6 合 1」計劃、融合、單模型路線、HF Space（§1–14）
 │   ├── HEXAD_BASELINE_128x640.txt# 第五輪：128×640 骨架基線
 │   ├── HEXAD_VOCAB_OVERLAP.txt   # 第五輪：五個 tokenizer 詞表重疊 / 同 span 率
@@ -296,3 +308,22 @@ nilpotent orbits in GL_6 = 11
 速度：K2 60 · R1 67 · Qwen3.5 39 · Limite 32 tok/s；融合約 10 tok/s。成本：ZeroGPU creator 免費，用 PRO 每日 40 分鐘額度。詳見計劃 §14。
 
 授權：Apache-2.0。
+
+## 13. 第六輪：對應湧現（T49–T68 / A40–A52）
+
+六個新模組 `src/28_*.mbt`–`src/33_*.mbt`，完整證見與誠實邊界見 [`docs/CORRESPONDENCE.md`](docs/CORRESPONDENCE.md)；
+管線視覺化見 [`docs/report_correspondence.html`](docs/report_correspondence.html)：
+
+| 模組 | 內容 | 定理 | 演算法 |
+|---|---|---|---|
+| `28_rigid_dmodules.mbt` | 形式圓盤 Hasse 對（`F = x^p`、`W` 係數抽取）、`ker(W−1)=k`、de Rham 核 `k[x^p]`、多項式載體反例、ind-凝聚層塔、Serre 類 ℓ−1、Kottwitz leg 符號 | T49–T50、¬T53、T52–T55、¬T56、T57a | A40–A44 |
+| `29_satake_correspondence.mbt` | η-積導出的 `a_n`（60 項）、點計數 `a_p = p+1−#E(F_p)`、Satake 純性 `r₁r₂=p`、SYM²/∧² 重耦、JL 符號 Newton、Fricke ε=+1 | T57–T60 | A45–A46 |
+| `30_hamiltonian_symmetric.mbt` | Jacobi 三對角 ⇄ 正交多項式（Favard）、Hamburger Hankel 正定、(p+1)-正則樹雙陪集、S-對偶對合與度量互逆 | T61–T63 | A47–A49 |
+| `31_infinity_adjunctions.mbt` | 六函子 `f^! ⊣ f_!`、`D∘f^! = f_!∘D`（方向相反）、span 上 Beck–Chevalley、六通道伴隨管線 | T64 | A50 |
+| `32_spectral_zeta_clausen.mbt` | Λ 反射/實值/Schwarz、Montgomery 間距、三因子重組 × Hadamard 截面、Clausen 節點 `(2/3)` 階梯 | T65–T68 | A51–A52 |
+| `33_correspondence_emergence.mbt` | 六通道耦合 `run_correspondence_emergence(steps=30)`：每步重證全部通道 + `CorrespondenceTrace::csv` | T49–T68 綜合 | A50 |
+
+憑證：`correspondence_trace.csv`（31 步、15 欄）、`jacobi_spectrum.csv`（T61 五點譜，`p₅` 在譜上 ≤ 8.9×10⁻¹⁶）、
+`docs/report_correspondence.html`（5 張內嵌 SVG）。全部定理由 `moon test --deny-warn` 在 wasm + js 各 **113/113** 鎖定，
+死碼掃描 695 定義 / 0 零引用。第六輪同樣發現並公開了四個「教科書直譯會失敗」的點（¬T53 凝聚載體、¬T56 極限交換、
+Kottwitz 強乘積律僅對奇 d 成立、Clausen 傅立葉和不能以「項小」提早退出），並以可判定命題取代它們。

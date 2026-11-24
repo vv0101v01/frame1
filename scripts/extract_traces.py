@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Split `run_output.txt` into the two CSV traces used by the reports.
+"""Split `run_output.txt` into the CSV traces used by the reports.
 
 Both pipelines print their data between markers:
 
     # BEGIN_CSV ... # END_CSV                (round 1: supergeometry)
     # BEGIN_CSV_LANG ... # END_CSV_LANG      (round 2: Langlands)
+    # ... through # BEGIN_CSV_CORRESPONDENCE  (round 6: correspondence)
 
 This script turns those blocks into `emergence_trace.csv` and
 `langlands_trace.csv`, so the CSVs are always a *derived* artefact of a real
@@ -24,6 +25,11 @@ BLOCKS = [
     ("# BEGIN_CSV_FRONTIER", "# END_CSV_FRONTIER", "frontier_trace.csv"),
     ("# BEGIN_CSV_UNIVERSE", "# END_CSV_UNIVERSE", "universe_trace.csv"),
     ("# BEGIN_CSV_HEXAD", "# END_CSV_HEXAD", "hexad_trace.csv"),
+    (
+        "# BEGIN_CSV_CORRESPONDENCE",
+        "# END_CSV_CORRESPONDENCE",
+        "correspondence_trace.csv",
+    ),
 ]
 
 

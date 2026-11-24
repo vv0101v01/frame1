@@ -29,6 +29,12 @@ fn main {
   println("# BEGIN_CSV_UNIVERSE")
   println(utr.csv())
   println("# END_CSV_UNIVERSE")
+  // ---- sixth pipeline: round 6, correspondence emergence (T49-T68)
+  let ctr = @geo.run_correspondence_emergence()
+  println(ctr.summary)
+  println("# BEGIN_CSV_CORRESPONDENCE")
+  println(ctr.csv())
+  println("# END_CSV_CORRESPONDENCE")
   // ---- fifth pipeline: frame1-Hexad, 128 agents x 640 steps, ring vs LFM k-NN
   let hx = @geo.run_hexad_comparison()
   println(
