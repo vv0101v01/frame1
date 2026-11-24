@@ -49,32 +49,10 @@
 // ---------------------------------------------------------------------------
 
 ///|
-/// `x^p mod m` by square-and-multiply.
+/// `x^p mod m` — thin alias of the round-6 kernel `pmod_pow` (one shared
+/// implementation of square-and-multiply in the whole crate).
 pub fn pth_power_mod(x : Int32, p : Int32, m : Int32) -> Int32 {
-  if m <= 1 {
-    return 0
-  }
-  let mut result = 1
-  let mut base = x % m
-  let mut e = p
-  while e > 0 {
-    if e % 2 == 1 {
-      result = result * base % m
-    }
-    base = base * base % m
-    e = e / 2
-  }
-  result
-}
-
-///|
-/// `p^n` with saturation (all uses are tiny).
-pub fn int_pow(p : Int32, n : Int32) -> Int32 {
-  let mut r = 1
-  for _ in 0..<n {
-    r *= p
-  }
-  r
+  pmod_pow(x, p, m)
 }
 
 ///|

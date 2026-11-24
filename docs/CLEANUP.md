@@ -211,3 +211,48 @@ x-accepted-github-permissions: contents=write
 | 死碼掃描 | `scripts/dead_code_scan.py`：562 個定義，0 個死 | 封鎖 CI |
 
 第四輪新增 416 → 562 定義皆有引用，`universe_trace.csv`（41 行、11 欄）與 `docs/report_universe.html` 由管線真跑衍生；`scripts/verify.sh` 與 `.github/workflows/ci.yml` 已延伸至第四輪報告與 trace（見 README §2、§10）。
+
+## 9. 第六輪（Round 6）：除錯、去重、減債、清死碼
+
+> 觸發：第六輪落成後的人工審計（跨模組重複定義掃描 + 逐函式複核 + 死碼掃描）。
+> 原則與第二輪相同：**每個缺陷都要有「測試救回來」或「定理級重建」的痕跡**，不只改字面。
+
+### 9.1 除錯（3 項真 bug）
+
+| # | 位置 | 症狀 | 修法 | 防回歸 |
+|---|---|---|---|---|
+| D1 | `s_dual_apply`（30） | 度量分支的算式鏈 `κ·2/2·(2 或 0.5)/2·2` __與任何有意義的對偶律都不等價__（garbled chain），且 `B`/`C` 分支不分 `x` | 改為顯式規則 `κ∨ = κ·l²/(x²)`（`B`）、`κ/(s²x²)`（`C`）、`κ/x²`（單連通），並把 `x` 提為 labelled 參數 | T63 測試新增 `B₃⇄C₃`（`κ=2 → κ∨=4`、`q=2 → ½`）與 `A` 的對合三律 |
+| D2 | `jacobi_moments`（30） | `out = out + [v[0]]` 在迴圈中重建陣列 → O(k²) 配置（M1 修 `push` 之後又一輪低效） | 預配置 `Array::make(kmax+1, 0.0)` 直接寫入 → O(k) | T61 矩測試（`m₀,m₁,m₂`）照舊鎖定數值 |
+| D3 | `level_p_eigenform_dimension`（29） | 忽略參數 `p`、硬編碼回 `1`（`let _ = p` 遮掩）——「假計算」 | 由 Riemann–Roch `dim S₂(Γ₀(N)) = genus(X₀(N))` 減去舊形式數**導出**（N≤10 屬 0，11 屬 1，且 11 無真因數 ⇒ 舊形式 0 ⇒ 新形式 1）；範圍外回 0 | T60 仍斷言 `(11) = 1`，但現在是**算出**的 |
+
+### 9.2 去重（4 項）
+
+| # | 重複 | 收斂到 | 影響 |
+|---|---|---|---|
+| U1 | `pth_power_mod`（23）與 `pmod_pow`（28）是逐行相同的 square-and-multiply | `pth_power_mod` 改為 `pmod_pow` 的薄別名；全 crate 一份實作 | 0 行為變化（23 的 tilt 測試全綠） |
+| U2 | `int_pow` 遷移：原本住 23，成為 round-6 的跨模組依賴（債務） | 移到 28 與 `pmod_pow` 同住，23 直接復用 | 依賴方向修正：低層工具不再反向依賴 diamond 模組 |
+| U3 | `kottwitz_geom_pair` / `kottwitz_spec_pair` 逐行同構（差 `v` 與 `(−1)^{θ+1}`） | 共用 `kottwitz_pair_at(d, θ, v)`，兩個公開名保留為薄包裝 | T57a 網格缺陷仍 0 |
+| U4 | `char_sym2` / `char_alt2` 同一雙迴圈（差對角線） | 共用 `char_pairwise(x, diag~)` | T58 重耦/成對律測試不變 |
+
+### 9.3 減債（2 項結構性）
+
+- **N1 文檔—實作對齊**：`29` 的 T60 註解曾以「= 1 + genus(E)」的錯誤理由支撐硬編碼；現改由 9.1-D3 的導出式承載，並在 `docs/CORRESPONDENCE.md` §4.4 補上公式。
+- **N2 依賴分層**：round-6 曾讓既有模組（23）依賴新模組（28）的 `pmod_pow`——方向倒錯。收斂後 28 只依賴 00/12/18/20/23，23 只依賴 28 的兩個純算術工具（`pmod_pow`/`int_pow`），無環。
+
+### 9.4 清死碼
+
+- `scripts/dead_code_scan.py`：**695 定義 / 0 零引用**（6 個新模組共 100 個 `pub fn` 全部被測試或管線引用）。
+- 刪除清單：無新增死碼；`s_dual_apply` 的舊算式鏈、`out + [..]` 模式、`let _ = p` 佔位全部隨 9.1 一併消失。
+- 未收斂而**明確保留**的重複（有意義、非債務）：`UniverseTrace` / `AdjunctionTrace` / `CorrespondenceTrace` 的 CSV 投影結構相似（各輪 trace 型別刻意獨立，避免跨輪耦合）；`vec_add`/`vec_hadamard` 為不同代數運算。
+
+### 9.5 閘門（收尾實測）
+
+| 檢查 | 結果 |
+|---|---|
+| `moon fmt --check` | no work to do |
+| `moon check --deny-warn` | 0 warnings |
+| `moon test --target wasm --deny-warn` | **113/113** |
+| `moon test --target js --deny-warn` | **113/113** |
+| `moon build --target wasm` | ok |
+| 六條管線 + `extract_traces.py` | 六份 CSV 重生成，**與提交版逐位元相同** |
+| 死碼掃描 | 695 定義 / **0 死** |

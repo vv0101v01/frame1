@@ -5,7 +5,7 @@
 [![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-frame1--hexad-yellow)](https://huggingface.co/spaces/Transynergy/frame1-hexad)
 [![MoonBit](https://img.shields.io/badge/MoonBit-0.10.22-1f6feb)](https://www.moonbitlang.com/download)
 
-以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）、[`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）（第三輪前沿擴充與限制消除，T25–T34 / A21–A28）、
+以 **數學結構 ⟶ 計算機抽象 ⟶ 資料型別 ⟶ 可執行定律 ⟶ 定理 ⟶ 演算法** 的順序，把下列數學名詞實作成一個可編譯、可測試、可執行的 MoonBit 專案，並把抽象過程中浮現的定理與演算法整理在 [`docs/THEORY.md`](docs/THEORY.md)（第一輪，T1–T15 / A1–A12）、[`docs/LANGLANDS.md`](docs/LANGLANDS.md)（第二輪，T16–T24 / A13–A20）、[`docs/FRONTIER.md`](docs/FRONTIER.md)（第三輪前沿擴充與限制消除，T25–T34 / A21–A28）、
 [`docs/UNIVERSE.md`](docs/UNIVERSE.md)（第四輪，T35–T46 / A29–A37）、`docs/HEXAD_6IN1_PLAN.md`（第五輪，T47–T48）
 與 [`docs/CORRESPONDENCE.md`](docs/CORRESPONDENCE.md)（第六輪對應湧現，T49–T68 / A40–A52）。
 

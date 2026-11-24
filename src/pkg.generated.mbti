@@ -85,6 +85,8 @@ pub fn centralizer_dim_formula(Array[Int32]) -> Int32
 
 pub fn char_alt2(Array[Double]) -> Double
 
+pub fn char_pairwise(Array[Double], diag? : Bool) -> Double
+
 pub fn char_poly_at(Array[Double], Int32, Double) -> Double
 
 pub fn char_poly_monic(Array[Double], Int32, Double) -> Double
@@ -785,7 +787,7 @@ pub fn run_langlands(LanglandsConfig) -> LanglandsTrace
 
 pub fn run_universe_emergence(steps? : Int32, levels? : Int32, seed? : Int32) -> UniverseTrace
 
-pub fn s_dual_apply(SDualPair) -> SDualPair
+pub fn s_dual_apply(SDualPair, x? : Double) -> SDualPair
 
 pub fn s_dual_defect(SDualPair) -> Double
 

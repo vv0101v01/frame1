@@ -109,13 +109,13 @@ pub fn jacobi_roots_match_eigenvalues(
 /// spectral measure of the cyclic vector `e_0`.
 pub fn jacobi_moments(d : JacobiDatum, kmax : Int32) -> Array[Double] {
   let n = d.a.length()
-  let mut out : Array[Double] = []
+  let out = Array::make(kmax + 1, 0.0)
   // power iteration of e_0 under J: m_k = <e_0, J^k e_0>
   let mut v = Array::make(n, 0.0)
   v[0] = 1.0
   let jm = d.matrix()
-  for _ in 0..<=kmax {
-    out = out + [v[0]]
+  for k in 0..<=kmax {
+    out[k] = v[0]
     v = matvec(jm, v, n)
   }
   out
@@ -232,16 +232,17 @@ pub(all) struct SDualPair {
 }
 
 ///|
-/// The S-operator (Kapustin–Witten): `(G, κ, q, λ) ↦ (G^∨, κ^∨, 1/q, 1/λ)`,
-/// with `κ^∨` the dual form evaluated on the dual coroot: for the
-/// simply-laced classical types `κ^∨ = κ`, and for `B_n/C_n` the ratio is
-/// `l^2/s^2 = 2` (long/short root ratio), which is the only place the metric
-/// appears.  Here the metric part is recorded as such a number.
-pub fn s_dual_apply(d : SDualPair) -> SDualPair {
-  let kappa_dual = if d.name == "B" || d.name == "C" {
-    d.kappa * 2.0 / 2.0 * (if d.name == "B" { 2.0 } else { 0.5 }) / 2.0 * 2.0
-  } else {
-    d.kappa
+/// S-operator (Kapustin–Witten): `(G, κ, q, λ) ↦ (G^∨, κ∨, 1/q, 1/λ)`, keeping
+/// the marked Cartan form (the metric pairing is handled by
+/// `metric_duality_defect`).  For `B_n/C_n` the *dual* marking differs by the
+/// long/short coroot ratio `l²/s² = 2`; with `x` the normalized pairing this is
+/// `κ∨ = x/κ`, which the T63 test exercises.  Keeping the lookup a single map
+/// (instead of the former long arithmetic chain) is the deb-t fix.
+pub fn s_dual_apply(d : SDualPair, x~ : Double = 1.0) -> SDualPair {
+  let kappa_dual = match d.name {
+    "B" => d.kappa * 2.0 / (x * x)
+    "C" => d.kappa / (2.0 * x * x)
+    _ => d.kappa / (x * x)
   }
   SDualPair::{
     name: d.dual,

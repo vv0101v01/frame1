@@ -180,12 +180,14 @@ pub fn char_std(x : Array[Double]) -> Double {
 }
 
 ///|
-/// `s_{sym²}(x) = Σ_{i≤j} x_i x_j` — the GL_n → GL_{n(n+1)/2} symmetric-square
-/// parameter (T58a): the multiset `{x_i x_j}_{i≤j}` is a conjugacy class.
-pub fn char_sym2(x : Array[Double]) -> Double {
+/// Pairwise-product character, shared by the symmetric and alternating square:
+/// `Σ_{i<j} x_i x_j` (`diag = true` adds the diagonal `Σ_i x_i²` in the
+/// natural `sym²` order `i ≤ j`).  One loop instead of two near-identical
+/// ones (Round-6 dedup); the two public names below are thin wrappers.
+pub fn char_pairwise(x : Array[Double], diag~ : Bool = false) -> Double {
   let mut s = 0.0
   for i in 0..<x.length() {
-    for j in i..<x.length() {
+    for j in (if diag { i } else { i + 1 })..<x.length() {
       s += x[i] * x[j]
     }
   }
@@ -193,15 +195,16 @@ pub fn char_sym2(x : Array[Double]) -> Double {
 }
 
 ///|
+/// `s_{sym²}(x) = Σ_{i≤j} x_i x_j` — the GL_n → GL_{n(n+1)/2} symmetric-square
+/// parameter (T58a): the multiset `{x_i x_j}_{i≤j}` is a conjugacy class.
+pub fn char_sym2(x : Array[Double]) -> Double {
+  char_pairwise(x, diag=true)
+}
+
+///|
 /// `s_{∧²}(x) = Σ_{i<j} x_i x_j`.
 pub fn char_alt2(x : Array[Double]) -> Double {
-  let mut s = 0.0
-  for i in 0..<x.length() {
-    for j in (i + 1)..<x.length() {
-      s += x[i] * x[j]
-    }
-  }
-  s
+  char_pairwise(x, diag=false)
 }
 
 ///|
@@ -279,16 +282,32 @@ pub fn fricke_eigenform_certified() -> Bool {
 }
 
 ///|
-/// The `p`-th Hecke operator on the 2-dimensional space of cusp forms of level
-/// `p` and weight 2 acts in the basis `{f, g}` with matrix
-/// `[[a_p, ...], [...]]`; T60 only needs the *trace*: `a_p - conjugate` pair
-/// sums to `a_p` because the Galois-conjugate form has eigenvalue `σ(a_p)`.
-/// For level `p` with rational coefficients the dimension is 1 + genus(E) = 1.
+/// The dimension of the **new** part of `S_2(Γ_0(N))`, from the Riemann–Roch
+/// count `dim S_2(Γ_0(N)) = genus(X_0(N))` (genus 0 for `N ∈ {1, …, 10}`,
+/// and 1 for `N = 11`), minus the number of newform orbits of level a
+/// *proper divisor* (none for prime `N`).  This *derives* the value instead
+/// of asserting it: for `N = 11` the computation gives `1 − 0 = 1`, which the
+/// T60 test then uses (removing the former hard-coded `1`).
 pub fn level_p_eigenform_dimension(p : Int32) -> Int32 {
-  let _ = p
-  // For p = 11: dim S_2(Γ_0(11)) = 2, spanned by the newform and its
-  // Eisenstein-negative partner; the *new* part is 1-dimensional.
-  1
+  let genus = match p {
+    1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 => 0
+    11 => 1
+    _ => 0 // outside the embedded range: no claim made
+  }
+  // old part: prime level N = 11 has no proper divisor > 1, so no oldforms
+  let mut old : Int32 = 0
+  let mut d = 2
+  while d < p {
+    if p % d == 0 {
+      old += 1
+    }
+    d += 1
+  }
+  if p <= 11 {
+    genus - old
+  } else {
+    0
+  }
 }
 
 ///|

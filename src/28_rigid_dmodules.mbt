@@ -56,6 +56,17 @@ pub fn pmod_pow(a : Int32, e : Int32, m : Int32) -> Int32 {
 }
 
 ///|
+/// `p^n` for small non-negative `n` (exact in `Int32` for the ranges used
+/// throughout the crate; the single shared definition after the Round-6 dedup).
+pub fn int_pow(p : Int32, n : Int32) -> Int32 {
+  let mut r = 1
+  for _ in 0..<n {
+    r *= p
+  }
+  r
+}
+
+///|
 /// Legendre symbol `(a|p)` for an odd prime `p`.
 pub fn legendre_sym(a : Int32, p : Int32) -> Int32 {
   let r = pmod_pow(a, (p - 1) / 2, p)
